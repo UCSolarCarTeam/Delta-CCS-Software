@@ -144,9 +144,6 @@ void CanInterface::readCan()
       case MOTOR_ONE_BASE + DSP_TEMPERATURE_MEASUREMENT:
          readDspTemperature(messageReceived.data);
          break;
-      case MOTOR_ONE_BASE + ODOMETER_MEASUREMENT:
-         readOdometer(messageReceived.data);
-         break;
       case cmu0Temp:
          readCmuCellTemp(messageReceived.data, 0);
          break;
@@ -301,10 +298,9 @@ void CanInterface::readStatus(const unsigned char* messageData)
 {
    vehicleData_.receivedErrorCount = messageData[7];
    vehicleData_.transmittedErrorCount = messageData[6];
-   vehicleData_.activeMotor = messageData[5] << 8 + messageData[4];
-   vehicleData_.errorFlags = messageData[3] << 8 + messageData[2];
-   vehicleData_.limitFlags = messageData[1] << 8 + messageData[0];
-
+   vehicleData_.activeMotor = messageData[5] << (8 + messageData[4]);
+   vehicleData_.errorFlags = messageData[3] << (8 + messageData[2]);
+   vehicleData_.limitFlags = messageData[1] << (8 + messageData[0]);
 }
 
 void CanInterface::readbusCurrentA(const unsigned char* messageData)
@@ -369,14 +365,6 @@ void CanInterface::readDspTemperature(const unsigned char* messageData)
    writeCharArrayToFloat(messageData, receivedData);
    //Upper float not used.
    vehicleData_.dspBoardTemp = receivedData[0];
-}
-
-void CanInterface::readOdometer(const unsigned char* messageData)
-{
-   float receivedData[2];
-   writeCharArrayToFloat(messageData, receivedData);
-   vehicleData_.dcBusAmpHours = receivedData[1];
-   vehicleData_.odometer = receivedData[0];
 }
 
 void CanInterface::readCmuCellTemp(const unsigned char* messageData, int cmuCellNumber)

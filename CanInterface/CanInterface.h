@@ -43,7 +43,6 @@ private:
    void readBackEmf(const unsigned char* messageData);
    void readTemperature(const unsigned char* messageData);
    void readDspTemperature(const unsigned char* messageData);
-   void readOdometer(const unsigned char* messageData);
 
    void readCmuCellTemp(const unsigned char* messageData, int cmuCellNumber);
    void readCmuCellGroup1(const unsigned char* messageData, int cmuCellNumber);

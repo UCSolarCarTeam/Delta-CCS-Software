@@ -24,7 +24,6 @@ TelemetryReporting::TelemetryReporting(PinName uartTx,
 : bluetooth_(uartTx, uartRx)
 , vehicleData_(vehicleData)
 {
-   vehicleData_.pc.printf("init telem reporting\n");
 }
 
 void TelemetryReporting::initTelemetryReporting()
@@ -60,10 +59,8 @@ void TelemetryReporting::transmitVehicleStatus()
    sendFloatWithIdentifier("07", vehicleData_.motorCurrentReal);
    sendFloatWithIdentifier("08", vehicleData_.backEmfImaginary);
    sendFloatWithIdentifier("09", vehicleData_.ipmHeatSinkTemp);
-   sendFloatWithIdentifier("10", vehicleData_.motorTemp);
    sendFloatWithIdentifier("11", vehicleData_.dspBoardTemp);
    sendFloatWithIdentifier("12", vehicleData_.dcBusAmpHours);
-   sendFloatWithIdentifier("13", vehicleData_.odometer);
    sendVariableWithIdentifier("14", vehicleData_.receivedErrorCount);
    sendVariableWithIdentifier("15", vehicleData_.transmittedErrorCount);
 
@@ -111,20 +108,6 @@ void TelemetryReporting::transmitVehicleStatus()
    sendVariableWithIdentifier("57", vehicleData_.batteryCurrent);
    sendVariableWithIdentifier("58", vehicleData_.batteryVoltageThresholdRising);
    sendVariableWithIdentifier("59", vehicleData_.batteryVoltageThresholdFalling);
-//   sendFloatWithIdentifier(240, vehicleData_.packStateOfCharge);
-//   sendFloatWithIdentifier(241, vehicleData_.packStateOfChargePercentage);
-//   sendFloatWithIdentifier(242, vehicleData_.balancePackStateOfCharge);
-//   sendFloatWithIdentifier(243, vehicleData_.balancePackStateOfChargePercentage);
-//   sendVariableWithIdentifier(244, vehicleData_.prechargeDriverStatusFlags);
-//   sendVariableWithIdentifier(245, vehicleData_.prechargeState);
-//   sendVariableWithIdentifier(246, vehicleData_.contactorSupplyVoltage);
-//   sendVariableWithIdentifier(247, vehicleData_.prechargeTimerElapsedFlag);
-//   sendVariableWithIdentifier(248, vehicleData_.prechargeTimerCounter);
-//   sendVariableWithIdentifier(253, vehicleData_.bmuStatusFlagsExtended);
-//   sendVariableWithIdentifier(254, vehicleData_.fanSpeed0);
-//   sendVariableWithIdentifier(255, vehicleData_.fanSpeed1);
-//   sendVariableWithIdentifier(256, vehicleData_.fanCurrentConsumption);
-//   sendVariableWithIdentifier(257, vehicleData_.cmuCurrentConsumption);
 }
 
 int TelemetryReporting::fixPointApproixmation(const float input)
@@ -134,7 +117,7 @@ int TelemetryReporting::fixPointApproixmation(const float input)
 
 void TelemetryReporting::sendVariable(const int input)
 {
-   unsigned int bitsToSend = static_cast<int>(input);
+   unsigned int bitsToSend = static_cast<unsigned int>(input);
 
    for (int i = 0; i < sizeof(bitsToSend); ++i)
    {

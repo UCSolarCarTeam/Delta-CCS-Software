@@ -21,12 +21,12 @@
 class GraphicDisplay
 {
 public:
-  GraphicDisplay(SPI *spi, PinName cs, PinName DataOrCommand, PinName resetSignal);
+  GraphicDisplay(SPI *spi, PinName cs, PinName dataOrCommand, PinName resetSignal);
   
   void init(void);
   void test(void);
-  void GraphicDisplayOnOff(int input);
-  void Set_Display_Mode(int input);
+  void graphicDisplayOnOff(int input);
+  void set_Display_Mode(int input);
   void fillRamWithInput(int input);
   void fillRamSectionWithInput(int input, const unsigned char *columnBounds,
                                const unsigned char *rowBounds, 
@@ -39,31 +39,31 @@ private:
   
   SPI *spi_;
   DigitalOut cs_;               //Actve low
-  DigitalOut DataOrCommand_;    //Active low
+  DigitalOut dataOrCommand_;    //Active low
   DigitalOut resetSignal_;      //Active low.
 
-  void Set_Command_Lock(int input);
-  void Set_Column_Address(int input1, int input2);
-  void Set_Row_Address(int input1, int input2);
-  void Set_Display_On_Off(int input);
-  void Set_Display_Clock(int input);
-  void Set_Multiplex_Ratio(int input);
-  void Set_Display_Offset(int input);
-  void Set_Start_Line(int input);
-  void Set_Remap_Format(int input);
-  void Set_GPIO(int input);
-  void Set_Function_Selection(int input);
-  void Set_Display_Enhancement_A(int input1, int input2);
-  void Set_Contrast_Current(int input);
-  void Set_Master_Current(int input);
-  void Set_Linear_Gray_Scale_Table();
-  void Set_Phase_Length(int input);
-  void Set_Display_Enhancement_B();
-  void Set_Precharge_Voltage(int input);
-  void Set_Precharge_Period(int input);
-  void Set_VCOMH(int input);
-  void Set_Partial_Display(int input1, int input2, int input3);
-  void Write_To_RAM();
+  void set_Command_Lock(int input);
+  void set_Column_Address(int input1, int input2);
+  void set_Row_Address(int input1, int input2);
+  void set_Display_On_Off(int input);
+  void set_Display_Clock(int input);
+  void set_Multiplex_Ratio(int input);
+  void set_Display_Offset(int input);
+  void set_Start_Line(int input);
+  void set_Remap_Format(int input);
+  void set_GPIO(int input);
+  void set_Function_Selection(int input);
+  void set_Display_Enhancement_A(int input1, int input2);
+  void set_Contrast_Current(int input);
+  void set_Master_Current(int input);
+  void set_Linear_Gray_Scale_Table();
+  void set_Phase_Length(int input);
+  void set_Display_Enhancement_B();
+  void set_Precharge_Voltage(int input);
+  void set_Precharge_Period(int input);
+  void set_VCOMH(int input);
+  void set_Partial_Display(int input1, int input2, int input3);
+  void write_To_RAM();
   
   static const unsigned char OLEDtest[];
   

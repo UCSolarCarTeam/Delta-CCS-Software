@@ -32,7 +32,6 @@ Lights::Lights(PinName headLightsPin,
 , timer_()
 , vehicleData_(vehicleData)
 {
-    vehicleData_.pc.printf("init lights\n");
 }
 
 void Lights::initalizeLights()
