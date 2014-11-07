@@ -129,10 +129,10 @@ void TelemetryReporting::sendVariable(const int input)
 void TelemetryReporting::sendFloatWithIdentifier(const char* identifier, const float input)
 {
    char identifierString[50];
-   sprintf(identifierString, "#%s", identifier);
    bluetooth_.puts(identifierString);
    int dataToSend = fixPointApproixmation(input);
-   sendVariable(dataToSend);
+   sprintf(identifierString, "#%s%d", identifier, dataToSend);
+//   sendVariable(dataToSend);
    bluetooth_.putc('\n');
 }
 
@@ -140,8 +140,8 @@ template <typename T>
 void TelemetryReporting::sendVariableWithIdentifier(const char* identifier, const T input)
 {
    char identifierString[50];
-   sprintf(identifierString, "#%s", identifier);
+   sprintf(identifierString, "#%s%d", identifier, input);
    bluetooth_.puts(identifierString);  
-   sendVariable(static_cast<int>(input));
+//   sendVariable(static_cast<int>(input));
    bluetooth_.putc('\n');
 }

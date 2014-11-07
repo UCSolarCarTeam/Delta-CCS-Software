@@ -84,7 +84,6 @@ Ccs::Ccs()
 , telemetryTimer_(0)
 , displayTimer_(0)
 {
-    vehicleData_.pc.printf("Finished initalization of CCS\n");
 }
 
 void Ccs::initalizeActions()
