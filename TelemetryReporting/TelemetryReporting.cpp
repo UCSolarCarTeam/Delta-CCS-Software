@@ -59,80 +59,62 @@ void TelemetryReporting::transmitVehicleStatus()
    sendFloatWithIdentifier("07", vehicleData_.motorCurrentReal);
    sendFloatWithIdentifier("08", vehicleData_.backEmfImaginary);
    sendFloatWithIdentifier("09", vehicleData_.ipmHeatSinkTemp);
-   sendFloatWithIdentifier("11", vehicleData_.dspBoardTemp);
-   sendFloatWithIdentifier("12", vehicleData_.dcBusAmpHours);
-   sendVariableWithIdentifier("14", vehicleData_.receivedErrorCount);
-   sendVariableWithIdentifier("15", vehicleData_.transmittedErrorCount);
+   sendFloatWithIdentifier("10", vehicleData_.dspBoardTemp);
+   sendFloatWithIdentifier("11", vehicleData_.dcBusAmpHours);
+   sendFloatWithIdentifier("12", static_cast<float>(vehicleData_.receivedErrorCount));
+   sendFloatWithIdentifier("13", static_cast<float>(vehicleData_.transmittedErrorCount));
 
-   sendVariableWithIdentifier("16", vehicleData_.cmuData[0].pcbTemperature);
-   sendVariableWithIdentifier("17", vehicleData_.cmuData[0].cellTemperature);
-   sendVariableWithIdentifier("18", vehicleData_.cmuData[0].cellVoltage[0]);
-   sendVariableWithIdentifier("19", vehicleData_.cmuData[0].cellVoltage[1]);
-   sendVariableWithIdentifier("20", vehicleData_.cmuData[0].cellVoltage[2]);
-   sendVariableWithIdentifier("21", vehicleData_.cmuData[0].cellVoltage[3]);
-   sendVariableWithIdentifier("22", vehicleData_.cmuData[0].cellVoltage[4]);
-   sendVariableWithIdentifier("23", vehicleData_.cmuData[0].cellVoltage[5]);
-   sendVariableWithIdentifier("24", vehicleData_.cmuData[0].cellVoltage[6]);
-   sendVariableWithIdentifier("25", vehicleData_.cmuData[0].cellVoltage[7]);
-   sendVariableWithIdentifier("26", vehicleData_.cmuData[1].pcbTemperature);
-   sendVariableWithIdentifier("27", vehicleData_.cmuData[1].cellTemperature);
-   sendVariableWithIdentifier("28", vehicleData_.cmuData[1].cellVoltage[0]);
-   sendVariableWithIdentifier("29", vehicleData_.cmuData[1].cellVoltage[1]);
-   sendVariableWithIdentifier("30", vehicleData_.cmuData[1].cellVoltage[2]);
-   sendVariableWithIdentifier("31", vehicleData_.cmuData[1].cellVoltage[3]);
-   sendVariableWithIdentifier("32", vehicleData_.cmuData[1].cellVoltage[4]);
-   sendVariableWithIdentifier("33", vehicleData_.cmuData[1].cellVoltage[5]);
-   sendVariableWithIdentifier("34", vehicleData_.cmuData[1].cellVoltage[6]);
-   sendVariableWithIdentifier("35", vehicleData_.cmuData[1].cellVoltage[7]);
-   sendVariableWithIdentifier("36", vehicleData_.cmuData[2].pcbTemperature);
-   sendVariableWithIdentifier("37", vehicleData_.cmuData[2].cellTemperature);
-   sendVariableWithIdentifier("38", vehicleData_.cmuData[2].cellVoltage[0]);
-   sendVariableWithIdentifier("39", vehicleData_.cmuData[2].cellVoltage[1]);
-   sendVariableWithIdentifier("40", vehicleData_.cmuData[2].cellVoltage[2]);
-   sendVariableWithIdentifier("41", vehicleData_.cmuData[2].cellVoltage[3]);
-   sendVariableWithIdentifier("42", vehicleData_.cmuData[2].cellVoltage[4]);
-   sendVariableWithIdentifier("43", vehicleData_.cmuData[2].cellVoltage[5]);
-   sendVariableWithIdentifier("44", vehicleData_.cmuData[2].cellVoltage[6]);
-   sendVariableWithIdentifier("45", vehicleData_.cmuData[2].cellVoltage[7]);
-   sendVariableWithIdentifier("46", vehicleData_.cmuData[3].pcbTemperature);
-   sendVariableWithIdentifier("47", vehicleData_.cmuData[3].cellTemperature);
-   sendVariableWithIdentifier("48", vehicleData_.cmuData[3].cellVoltage[0]);
-   sendVariableWithIdentifier("49", vehicleData_.cmuData[3].cellVoltage[1]);
-   sendVariableWithIdentifier("50", vehicleData_.cmuData[3].cellVoltage[2]);
-   sendVariableWithIdentifier("51", vehicleData_.cmuData[3].cellVoltage[3]);
-   sendVariableWithIdentifier("52", vehicleData_.cmuData[3].cellVoltage[4]);
-   sendVariableWithIdentifier("53", vehicleData_.cmuData[3].cellVoltage[5]);
-   sendVariableWithIdentifier("54", vehicleData_.cmuData[3].cellVoltage[6]);
-   sendVariableWithIdentifier("55", vehicleData_.cmuData[3].cellVoltage[7]);   
-   sendVariableWithIdentifier("56", vehicleData_.batteryVoltage);
-   sendVariableWithIdentifier("57", vehicleData_.batteryCurrent);
-   sendVariableWithIdentifier("58", vehicleData_.batteryVoltageThresholdRising);
-   sendVariableWithIdentifier("59", vehicleData_.batteryVoltageThresholdFalling);
-}
-
-int TelemetryReporting::fixPointApproixmation(const float input)
-{
-   return static_cast<int>(input * 1000.0f); 
-}
-
-void TelemetryReporting::sendVariable(const int input)
-{
-   unsigned int bitsToSend = static_cast<unsigned int>(input);
-
-   for (int i = 0; i < sizeof(bitsToSend); ++i)
-   {
-      bluetooth_.putc(bitsToSend & 0xFF);
-      bitsToSend = bitsToSend >> 8;
-   }
+   sendFloatWithIdentifier("14", vehicleData_.cmuData[0].pcbTemperature);
+   sendFloatWithIdentifier("15", vehicleData_.cmuData[0].cellTemperature);
+   sendFloatWithIdentifier("16", vehicleData_.cmuData[0].cellVoltage[0]);
+   sendFloatWithIdentifier("17", vehicleData_.cmuData[0].cellVoltage[1]);
+   sendFloatWithIdentifier("18", vehicleData_.cmuData[0].cellVoltage[2]);
+   sendFloatWithIdentifier("19", vehicleData_.cmuData[0].cellVoltage[3]);
+   sendFloatWithIdentifier("20", vehicleData_.cmuData[0].cellVoltage[4]);
+   sendFloatWithIdentifier("21", vehicleData_.cmuData[0].cellVoltage[5]);
+   sendFloatWithIdentifier("22", vehicleData_.cmuData[0].cellVoltage[6]);
+   sendFloatWithIdentifier("23", vehicleData_.cmuData[0].cellVoltage[7]);
+   sendFloatWithIdentifier("24", vehicleData_.cmuData[1].pcbTemperature);
+   sendFloatWithIdentifier("25", vehicleData_.cmuData[1].cellTemperature);
+   sendFloatWithIdentifier("26", vehicleData_.cmuData[1].cellVoltage[0]);
+   sendFloatWithIdentifier("27", vehicleData_.cmuData[1].cellVoltage[1]);
+   sendFloatWithIdentifier("28", vehicleData_.cmuData[1].cellVoltage[2]);
+   sendFloatWithIdentifier("29", vehicleData_.cmuData[1].cellVoltage[3]);
+   sendFloatWithIdentifier("30", vehicleData_.cmuData[1].cellVoltage[4]);
+   sendFloatWithIdentifier("31", vehicleData_.cmuData[1].cellVoltage[5]);
+   sendFloatWithIdentifier("32", vehicleData_.cmuData[1].cellVoltage[6]);
+   sendFloatWithIdentifier("33", vehicleData_.cmuData[1].cellVoltage[7]);
+   sendFloatWithIdentifier("34", vehicleData_.cmuData[2].pcbTemperature);
+   sendFloatWithIdentifier("35", vehicleData_.cmuData[2].cellTemperature);
+   sendFloatWithIdentifier("36", vehicleData_.cmuData[2].cellVoltage[0]);
+   sendFloatWithIdentifier("37", vehicleData_.cmuData[2].cellVoltage[1]);
+   sendFloatWithIdentifier("38", vehicleData_.cmuData[2].cellVoltage[2]);
+   sendFloatWithIdentifier("39", vehicleData_.cmuData[2].cellVoltage[3]);
+   sendFloatWithIdentifier("40", vehicleData_.cmuData[2].cellVoltage[4]);
+   sendFloatWithIdentifier("41", vehicleData_.cmuData[2].cellVoltage[5]);
+   sendFloatWithIdentifier("42", vehicleData_.cmuData[2].cellVoltage[6]);
+   sendFloatWithIdentifier("43", vehicleData_.cmuData[2].cellVoltage[7]);
+   sendFloatWithIdentifier("44", vehicleData_.cmuData[3].pcbTemperature);
+   sendFloatWithIdentifier("45", vehicleData_.cmuData[3].cellTemperature);
+   sendFloatWithIdentifier("46", vehicleData_.cmuData[3].cellVoltage[0]);
+   sendFloatWithIdentifier("47", vehicleData_.cmuData[3].cellVoltage[1]);
+   sendFloatWithIdentifier("48", vehicleData_.cmuData[3].cellVoltage[2]);
+   sendFloatWithIdentifier("49", vehicleData_.cmuData[3].cellVoltage[3]);
+   sendFloatWithIdentifier("50", vehicleData_.cmuData[3].cellVoltage[4]);
+   sendFloatWithIdentifier("51", vehicleData_.cmuData[3].cellVoltage[5]);
+   sendFloatWithIdentifier("52", vehicleData_.cmuData[3].cellVoltage[6]);
+   sendFloatWithIdentifier("53", vehicleData_.cmuData[3].cellVoltage[7]);   
+   sendFloatWithIdentifier("54", vehicleData_.batteryVoltage);
+   sendFloatWithIdentifier("55", vehicleData_.batteryCurrent);
+   sendFloatWithIdentifier("56", static_cast<float>(vehicleData_.batteryVoltageThresholdRising));
+   sendFloatWithIdentifier("57", static_cast<float>(vehicleData_.batteryVoltageThresholdFalling));
 }
 
 void TelemetryReporting::sendFloatWithIdentifier(const char* identifier, const float input)
 {
    char identifierString[50];
    bluetooth_.puts(identifierString);
-   int dataToSend = fixPointApproixmation(input);
-   sprintf(identifierString, "#%s%d", identifier, dataToSend);
-//   sendVariable(dataToSend);
+   sprintf(identifierString, "#%s%.3f", identifier, input);
    bluetooth_.putc('\n');
 }
 
@@ -142,6 +124,5 @@ void TelemetryReporting::sendVariableWithIdentifier(const char* identifier, cons
    char identifierString[50];
    sprintf(identifierString, "#%s%d", identifier, input);
    bluetooth_.puts(identifierString);  
-//   sendVariable(static_cast<int>(input));
    bluetooth_.putc('\n');
 }

@@ -24,7 +24,6 @@ public:
 
 private:
    void transmitVehicleStatus();
-   int fixPointApproixmation(const float input);
    
    void sendVariable(const int input);
    void sendFloatWithIdentifier(const char* identifier, const float input);

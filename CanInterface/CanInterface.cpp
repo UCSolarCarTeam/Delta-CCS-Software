@@ -371,26 +371,26 @@ void CanInterface::readCmuCellTemp(const unsigned char* messageData, int cmuCell
 {
    TritiumDataFormatter messageDataFormatted;
    populateTritiumDataFormatter(messageData, messageDataFormatted);
-   vehicleData_.cmuData[cmuCellNumber].pcbTemperature = messageDataFormatted.intData[2];
-   vehicleData_.cmuData[cmuCellNumber].cellTemperature = messageDataFormatted.intData[3];
+   vehicleData_.cmuData[cmuCellNumber].pcbTemperature = messageDataFormatted.intData[2] / 10.0;
+   vehicleData_.cmuData[cmuCellNumber].cellTemperature = messageDataFormatted.intData[3] / 10.0;
 }
 void CanInterface::readCmuCellGroup1(const unsigned char* messageData, int cmuCellNumber)
 {
    TritiumDataFormatter messageDataFormatted;
    populateTritiumDataFormatter(messageData, messageDataFormatted);
-   vehicleData_.cmuData[cmuCellNumber].cellVoltage[0] = messageDataFormatted.intData[0];
-   vehicleData_.cmuData[cmuCellNumber].cellVoltage[1] = messageDataFormatted.intData[1];
-   vehicleData_.cmuData[cmuCellNumber].cellVoltage[2] = messageDataFormatted.intData[2];
-   vehicleData_.cmuData[cmuCellNumber].cellVoltage[3] = messageDataFormatted.intData[3];
+   vehicleData_.cmuData[cmuCellNumber].cellVoltage[0] = messageDataFormatted.intData[0] / 1000.0;
+   vehicleData_.cmuData[cmuCellNumber].cellVoltage[1] = messageDataFormatted.intData[1] / 1000.0;
+   vehicleData_.cmuData[cmuCellNumber].cellVoltage[2] = messageDataFormatted.intData[2] / 1000.0;
+   vehicleData_.cmuData[cmuCellNumber].cellVoltage[3] = messageDataFormatted.intData[3] / 1000.0;
 }
 void CanInterface::readCmuCellGroup2(const unsigned char* messageData, int cmuCellNumber)
 {
    TritiumDataFormatter messageDataFormatted;
    populateTritiumDataFormatter(messageData, messageDataFormatted);
-   vehicleData_.cmuData[cmuCellNumber].cellVoltage[4] = messageDataFormatted.intData[0];
-   vehicleData_.cmuData[cmuCellNumber].cellVoltage[5] = messageDataFormatted.intData[1];
-   vehicleData_.cmuData[cmuCellNumber].cellVoltage[6] = messageDataFormatted.intData[2];
-   vehicleData_.cmuData[cmuCellNumber].cellVoltage[7] = messageDataFormatted.intData[3];
+   vehicleData_.cmuData[cmuCellNumber].cellVoltage[4] = messageDataFormatted.intData[0] / 1000.0;
+   vehicleData_.cmuData[cmuCellNumber].cellVoltage[5] = messageDataFormatted.intData[1] / 1000.0;
+   vehicleData_.cmuData[cmuCellNumber].cellVoltage[6] = messageDataFormatted.intData[2] / 1000.0;
+   vehicleData_.cmuData[cmuCellNumber].cellVoltage[7] = messageDataFormatted.intData[3] / 1000.0;
 }
 void CanInterface::readStateOfCharge(const unsigned char* messageData)
 {
@@ -420,8 +420,8 @@ void CanInterface::readPackVoltageCurrent(const unsigned char* messageData)
 {
    TritiumDataFormatter messageDataFormatted;
    populateTritiumDataFormatter(messageData, messageDataFormatted);
-   vehicleData_.batteryVoltage = messageDataFormatted.unsignedLongData[0];
-   vehicleData_.batteryCurrent = messageDataFormatted.longData[1];
+   vehicleData_.batteryVoltage = messageDataFormatted.unsignedLongData[0] / 1000.0;
+   vehicleData_.batteryCurrent = messageDataFormatted.longData[1] / 1000.0;
 }
 void CanInterface::readPackStatus(const unsigned char* messageData)
 {

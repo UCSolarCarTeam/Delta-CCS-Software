@@ -8,7 +8,7 @@ struct CmuData
 {
    CmuData();
 
-   short int pcbTemperature;
-   short int cellTemperature;
-   short int cellVoltage[8];
+   float pcbTemperature;
+   float cellTemperature;
+   float cellVoltage[8];
 };

@@ -15,8 +15,6 @@ namespace VehicleDataEnums
 }
 
 // Container for all parameters within the CCS, 
-// This was a conscience decision to not to have good encapsulation here
-// for overall ease of writing.
 struct VehicleData
 {
    VehicleData();
@@ -65,10 +63,10 @@ struct VehicleData
    unsigned char prechargeDriverStatusFlags; //Note: change this out for a enum
    unsigned char prechargeState;
    unsigned int contactorSupplyVoltage;
-   unsigned prechargeTimerElapsedFlag;
-   unsigned prechargeTimerCounter;
-   unsigned long batteryVoltage; //V
-   long batteryCurrent; //mA
+   unsigned int prechargeTimerElapsedFlag;
+   unsigned int prechargeTimerCounter;
+   float batteryVoltage;
+   float batteryCurrent;
    unsigned int batteryVoltageThresholdRising;
    unsigned int batteryVoltageThresholdFalling;
    unsigned long bmuStatusFlagsExtended;
