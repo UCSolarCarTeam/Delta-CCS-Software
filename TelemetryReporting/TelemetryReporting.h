@@ -1,7 +1,7 @@
 /*-------------------------------------------------------
    Made for the ccs mbed LPC-1768
    By Jordan Heinrichs on for the Solar Car Team
-   Copyright (c) 2014 by University of Calgary Solar Car Team 
+   Copyright (c) 2014 by University of Calgary Solar Car Team
 -------------------------------------------------------*/
 
 #pragma once
@@ -23,15 +23,24 @@ public:
    void transmitTelemetry();
 
 private:
-   void transmitVehicleStatus();
-   
-   void sendVariable(const int input);
-   void sendFloatWithIdentifier(const char* identifier, const float input);
+   void sendKeyDriverControlTelemetry();
+   void sendDriverControlDetails();
+   void sendFaults();
+   void sendBatteryData();
+   void sendCmuData(unsigned char cmuDataIndex);
 
-   template<typename T>
-   void sendVariableWithIdentifier(const char* identifier, const T input);
+   // Will return length of framed data
+   unsigned int frameData(const unsigned char* dataToEncode,
+         unsigned long length, unsigned char* frameData);
+
+   // Will return length of encoded data
+   unsigned int stuffData(const unsigned char* dataToEncode,
+         unsigned long length, unsigned char* encodedData);
+
+   void writeFloatIntoData(unsigned char* data, int index, float& value);
+   void sendData(const unsigned char* data, int length);
 
 private:
-   RawSerial bluetooth_;
+   RawSerial uart_;
    VehicleData& vehicleData_;
 };

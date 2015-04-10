@@ -1,7 +1,7 @@
 /*-------------------------------------------------------
    Made for the ccs mbed LPC-1768
    By Jordan Heinrichs on for the Solar Car Team
-   Copyright (c) 2014 by University of Calgary Solar Car Team 
+   Copyright (c) 2014 by University of Calgary Solar Car Team
 -------------------------------------------------------*/
 
 #pragma once
@@ -14,7 +14,7 @@ namespace VehicleDataEnums
     enum CarDirection {FORWARD = 0, REVERSE = 1};
 }
 
-// Container for all parameters within the CCS, 
+// Container for all parameters within the CCS,
 struct VehicleData
 {
    VehicleData();
@@ -29,7 +29,7 @@ struct VehicleData
    float driverSetSpeedRpm;
    float driverSetSpeedKph;
    bool deadmanPressed;
-   VehicleDataEnums::CarDirection carDirection; 
+   VehicleDataEnums::CarDirection carDirection;
 
    //Motor Controller
    float busCurrentA;
@@ -53,7 +53,7 @@ struct VehicleData
    short int activeMotor;
    short int errorFlags;
    short int limitFlags;
-   
+
    //BMU Data
    CmuData cmuData[4];
    float packStateOfCharge;
@@ -74,7 +74,10 @@ struct VehicleData
    unsigned int fanSpeed1;
    unsigned int fanCurrentConsumption;
    unsigned int cmuCurrentConsumption;
-   
+
+   // Accessory power unit
+   bool secondaryBatteryUnderVoltage;
+
    //Light fields
    bool leftBlinkerActivated;
    bool rightBlinkerActivated;
@@ -85,6 +88,6 @@ struct VehicleData
    //OLED display fields
    bool bluetoothConnected;
    bool faultDetected;
-   
+
    Serial pc;
 };
