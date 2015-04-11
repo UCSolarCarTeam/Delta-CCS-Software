@@ -67,7 +67,7 @@ CrcCalculator::~CrcCalculator()
 {
 }
 
-unsigned short CrcCalculator::calculateCrc16(char* input, int lenght)
+unsigned short CrcCalculator::calculateCrc16(unsigned char* input, int lenght)
 {
    unsigned short crc16 = START;
 

@@ -32,10 +32,11 @@ private:
    // Will return length of framed data
    unsigned int frameData(const unsigned char* dataToEncode,
          unsigned long length, unsigned char* frameData);
-
    // Will return length of encoded data
    unsigned int stuffData(const unsigned char* dataToEncode,
          unsigned long length, unsigned char* encodedData);
+   // Add checksum into data at index length and length + 1
+   void addChecksum(unsigned char* data, unsigned int length);
 
    void writeFloatIntoData(unsigned char* data, int index, float& value);
    void sendData(const unsigned char* data, int length);

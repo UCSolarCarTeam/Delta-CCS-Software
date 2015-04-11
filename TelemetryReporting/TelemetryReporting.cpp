@@ -4,8 +4,9 @@
    Copyright (c) 2014 by University of Calgary Solar Car Team
 -------------------------------------------------------*/
 
-#define BLUETOOTH
+#define BLUETOOTH 0
 
+#include <CrcCalculator.h>
 #include <TelemetryReporting.h>
 #include <VehicleData.h>
 
@@ -23,6 +24,24 @@ namespace
    SerialBase::Parity BLUETOOTH_PARITY = SerialBase::None;
 
    const char GET_BLUETOOTH_STATUS[] = "AT\n";
+
+   // These lengths only include the data. Not the checksum
+   const unsigned int KEY_DRIVER_CONTROL_LENGTH = 21;
+   const unsigned int DRIVER_CONTROL_DETAILS_LENGTH = 29;
+   const unsigned int FAULT_LENGTH = 7;
+   const unsigned int BATTERY_DATA_LENGTH = 18;
+   const unsigned int CMU_DATA_LENGTH = 43;
+   const unsigned int CHECKSUM_LENGTH = 2;
+
+   const unsigned int FRAMING_LENGTH_INCREASE = 5;
+   const unsigned char TERMINATING_BYTE = 0x00;
+
+   // Packet IDs
+   const unsigned char KEY_DRIVER_CONTROL_ID = 0x01;
+   const unsigned char DRIVER_CONTROL_DETAILS_ID = 0x02;
+   const unsigned char FAULT_ID = 0x03;
+   const unsigned char BATTERY_DATA_ID = 0x04;
+   const unsigned char CMU_DATA_ID = 0x05;
 }
 
 TelemetryReporting::TelemetryReporting(PinName uartTx,
@@ -65,25 +84,26 @@ void TelemetryReporting::transmitTelemetry()
 
 void TelemetryReporting::sendKeyDriverControlTelemetry()
 {
-   const int packetPayloadLength = 21;
-   unsigned char packetPayload[packetPayloadLength];
-   packetPayload[0] = 0x01;
+   const unsigned int unframedPacketLength = KEY_DRIVER_CONTROL_LENGTH + CHECKSUM_LENGTH;
+   unsigned char packetPayload[unframedPacketLength];
+   packetPayload[0] = KEY_DRIVER_CONTROL_ID;
    writeFloatIntoData(packetPayload, 1, vehicleData_.actualSpeedRpm); //todo send m/s
    writeFloatIntoData(packetPayload, 5, vehicleData_.driverSetCurrentA);
    writeFloatIntoData(packetPayload, 9, vehicleData_.busCurrentA);
    writeFloatIntoData(packetPayload, 13, vehicleData_.busVoltage);
    writeFloatIntoData(packetPayload, 17, vehicleData_.vehicleVelocityKph);
 
-   unsigned char packet[50];
-   unsigned int packetLength = frameData(packetPayload, packetPayloadLength, packet);
+   addChecksum(packetPayload, KEY_DRIVER_CONTROL_LENGTH);
+   unsigned char packet[unframedPacketLength + FRAMING_LENGTH_INCREASE];
+   unsigned int packetLength = frameData(packetPayload, unframedPacketLength, packet);
    sendData(packet, packetLength);
 }
 
 void TelemetryReporting::sendDriverControlDetails()
 {
-   const int packetPayloadLength = 29;
-   unsigned char packetPayload[packetPayloadLength];
-   packetPayload[0] = 0x02;
+   const unsigned int unframedPacketLength = DRIVER_CONTROL_DETAILS_LENGTH + CHECKSUM_LENGTH;
+   unsigned char packetPayload[unframedPacketLength];
+   packetPayload[0] = DRIVER_CONTROL_DETAILS_ID;
    writeFloatIntoData(packetPayload, 1, vehicleData_.motorVelocityRpm);
    writeFloatIntoData(packetPayload, 5, vehicleData_.motorVoltageReal);
    writeFloatIntoData(packetPayload, 9, vehicleData_.motorCurrentReal);
@@ -92,47 +112,52 @@ void TelemetryReporting::sendDriverControlDetails()
    writeFloatIntoData(packetPayload, 21, vehicleData_.dcBusAmpHours);
    writeFloatIntoData(packetPayload, 25, vehicleData_.odometer);
 
-   unsigned char packet[50];
-   unsigned int packetLength = frameData(packetPayload, packetPayloadLength, packet);
+   addChecksum(packetPayload, DRIVER_CONTROL_DETAILS_LENGTH);
+   unsigned char packet[unframedPacketLength + FRAMING_LENGTH_INCREASE];
+   unsigned int packetLength = frameData(packetPayload, unframedPacketLength, packet);
    sendData(packet, packetLength);
 }
 
 void TelemetryReporting::sendFaults()
 {
-   const int packetPayloadLength = 7;
-   unsigned char packetPayload[packetPayloadLength];
-   packetPayload[0] = 0x03;
+   const unsigned int unframedPacketLength = FAULT_LENGTH + CHECKSUM_LENGTH;
+   unsigned char packetPayload[unframedPacketLength];
+   packetPayload[0] = FAULT_ID;
    packetPayload[1] = static_cast<unsigned char>(0xFF & vehicleData_.errorFlags);
    packetPayload[2] = static_cast<unsigned char>(0xFF & vehicleData_.limitFlags);
    packetPayload[3] = static_cast<unsigned char>(0xFF & vehicleData_.bmuStatusFlagsExtended);
-   packetPayload[4] = static_cast<unsigned char>(0xFF & (vehicleData_.bmuStatusFlagsExtended >> 1));
+   packetPayload[4] = static_cast<unsigned char>(0xFF & (vehicleData_.bmuStatusFlagsExtended >> 8));
    packetPayload[5] = vehicleData_.receivedErrorCount;
    packetPayload[6] = vehicleData_.transmittedErrorCount;
-   unsigned char packet[10];
-   unsigned int packetLength = frameData(packetPayload, packetPayloadLength, packet);
+
+   addChecksum(packetPayload, FAULT_LENGTH);
+   unsigned char packet[unframedPacketLength + FRAMING_LENGTH_INCREASE];
+   unsigned int packetLength = frameData(packetPayload, unframedPacketLength, packet);
    sendData(packet, packetLength);
 }
 
 void TelemetryReporting::sendBatteryData()
 {
-   const int packetPayloadLength = 18;
-   unsigned char packetPayload[packetPayloadLength];
-   packetPayload[0] = 0x04;
+   const unsigned int unframedPacketLength = BATTERY_DATA_LENGTH + CHECKSUM_LENGTH;
+   unsigned char packetPayload[unframedPacketLength];
+   packetPayload[0] = BATTERY_DATA_ID;
    writeFloatIntoData(packetPayload, 1, vehicleData_.batteryVoltage);
    writeFloatIntoData(packetPayload, 5, vehicleData_.batteryCurrent);
    writeFloatIntoData(packetPayload, 9, vehicleData_.packStateOfChargePercentage);
    writeFloatIntoData(packetPayload, 13, vehicleData_.balancePackStateOfCharge);
    packetPayload[17] = static_cast<unsigned char>(vehicleData_.secondaryBatteryUnderVoltage);
-   unsigned char packet[25];
-   unsigned int packetLength = frameData(packetPayload, packetPayloadLength, packet);
+
+   addChecksum(packetPayload, BATTERY_DATA_LENGTH);
+   unsigned char packet[unframedPacketLength + FRAMING_LENGTH_INCREASE];
+   unsigned int packetLength = frameData(packetPayload, unframedPacketLength, packet);
    sendData(packet, packetLength);
 }
 
 void TelemetryReporting::sendCmuData(unsigned char cmuDataIndex)
 {
-   const int packetPayloadLength = 43;
-   unsigned char packetPayload[packetPayloadLength];
-   packetPayload[0] = 0x05;
+   const unsigned int unframedPacketLength = CMU_DATA_LENGTH + CHECKSUM_LENGTH;
+   unsigned char packetPayload[unframedPacketLength];
+   packetPayload[0] = CMU_DATA_ID;
    packetPayload[1] = cmuDataIndex;
    writeFloatIntoData(packetPayload, 2, vehicleData_.cmuData[cmuDataIndex].pcbTemperature);
    writeFloatIntoData(packetPayload, 6, vehicleData_.cmuData[cmuDataIndex].cellTemperature);
@@ -144,8 +169,10 @@ void TelemetryReporting::sendCmuData(unsigned char cmuDataIndex)
    writeFloatIntoData(packetPayload, 30, vehicleData_.cmuData[cmuDataIndex].cellVoltage[5]);
    writeFloatIntoData(packetPayload, 34, vehicleData_.cmuData[cmuDataIndex].cellVoltage[6]);
    writeFloatIntoData(packetPayload, 38, vehicleData_.cmuData[cmuDataIndex].cellVoltage[7]);
-   unsigned char packet[50];
-   unsigned int packetLength = frameData(packetPayload, packetPayloadLength, packet);
+
+   addChecksum(packetPayload, CMU_DATA_LENGTH);
+   unsigned char packet[unframedPacketLength + FRAMING_LENGTH_INCREASE];
+   unsigned int packetLength = frameData(packetPayload, unframedPacketLength, packet);
    sendData(packet, packetLength);
 }
 
@@ -154,7 +181,7 @@ unsigned int TelemetryReporting::frameData(const unsigned char* dataToEncode,
 {
    unsigned int lengthOfFramedData =
       stuffData(dataToEncode, length, frameData);
-   frameData[lengthOfFramedData++] = 0x00;
+   frameData[lengthOfFramedData++] = TERMINATING_BYTE;
    return lengthOfFramedData;
 }
 
@@ -194,8 +221,14 @@ unsigned int TelemetryReporting::stuffData(const unsigned char* dataToEncode,
    FINISH_BLOCK(code);
    return lengthOfEncodedData;
 }
-
 #undef FINISH_BLOCK
+
+void TelemetryReporting::addChecksum(unsigned char* data, unsigned int length)
+{
+   unsigned short crc16 = CrcCalculator::calculateCrc16(data, length);
+   data[length] = static_cast<unsigned char>(0xFF & crc16);
+   data[length + 1] = static_cast<unsigned char>(0xFF & (crc16 >> 8));
+}
 
 void TelemetryReporting::writeFloatIntoData(unsigned char* data, int index, float& value)
 {

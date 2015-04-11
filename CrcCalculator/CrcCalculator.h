@@ -22,7 +22,7 @@ public:
    CrcCalculator();
    ~CrcCalculator();
 
-   static unsigned short calculateCrc16(char* input, int lenght);
+   static unsigned short calculateCrc16(unsigned char* input, int lenght);
 
 private:
    static const unsigned short crc16table[256];
