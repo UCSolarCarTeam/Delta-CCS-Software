@@ -1,17 +1,16 @@
+#pragma once
 /*-------------------------------------------------------
    Made for the ccs mbed LPC-1768
    By Jordan Heinrichs on for the Solar Car Team
    Copyright (c) 2014 by University of Calgary Solar Car Team
 -------------------------------------------------------*/
 
-#pragma once
-
 #include <mbed.h>
 #include <CmuData.h>
 
 namespace VehicleDataEnums
 {
-    enum CarDirection {FORWARD = 0, REVERSE = 1};
+    enum CarDirection {Forward = 0, Reverse = 1};
 }
 
 // Container for all parameters within the CCS,
@@ -19,22 +18,19 @@ struct VehicleData
 {
    VehicleData();
 
-   float actualCurrentA;
-   float driverSetCurrentA;
+   float reportedMotorCurrent;
+   float driverSetCurrent;
 
    //Driver inputs
-   float actualSpeedRpm;
-   float actualCurrent;
-   float driverSetCurrent;
+   float driverSetCurrentPercentage;
    float driverSetSpeedRpm;
-   float driverSetSpeedKph;
    bool deadmanPressed;
    VehicleDataEnums::CarDirection carDirection;
 
    //Motor Controller
-   float busCurrentA;
+   float busCurrent;
    float busVoltage;
-   float vehicleVelocityKph;
+   float vehicleVelocity;
    float motorVelocityRpm;
    float phaseCCurrent;
    float phaseBCurrent;
@@ -60,7 +56,7 @@ struct VehicleData
    float packStateOfChargePercentage;
    float balancePackStateOfCharge;
    float balancePackStateOfChargePercentage;
-   unsigned char prechargeDriverStatusFlags; //Note: change this out for a enum
+   unsigned char prechargeDriverStatusFlags;
    unsigned char prechargeState;
    unsigned int contactorSupplyVoltage;
    unsigned int prechargeTimerElapsedFlag;
@@ -83,10 +79,6 @@ struct VehicleData
    bool rightBlinkerActivated;
    bool brakelightOn;
    bool hazardsActivated;
-
-   //OLED display fields
-   bool bluetoothConnected;
-   bool faultDetected;
 
    Serial pc;
 };

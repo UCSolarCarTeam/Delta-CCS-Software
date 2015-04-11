@@ -1,7 +1,7 @@
+#include <CcsDefines.h>
 #include <CharDisplay.h>
-#include <VehicleData.h>
-
 #include <Dashboard.h>
+#include <VehicleData.h>
 
 Dashboard::Dashboard(PinName mosi, PinName miso, PinName clock,
    PinName chipSelectCharDisplay, VehicleData& vehicleData)
@@ -25,10 +25,12 @@ void Dashboard::displayDashboard()
    char message3[21];
    char message4[21];
 
-   sprintf(message1, "ATCL %4.1f V %4.1f A ", vehicleData_.busVoltage, vehicleData_.busCurrentA);
-   sprintf(message2, "ATCL Speed: %3.0f km/h", vehicleData_.vehicleVelocityKph);
-   sprintf(message3, "Set  Amp:   %4.1f  A", vehicleData_.driverSetCurrentA);
-   sprintf(message4, "Set Speed:  %3.1f km/h", vehicleData_.driverSetSpeedKph);
+   sprintf(message1, "ATCL %4.1f V %4.1f A ", vehicleData_.busVoltage, vehicleData_.busCurrent);
+   const float vehicleVelocityKph = vehicleData_.vehicleVelocity * CcsDefines::MPS_KPH_CONVERSION;
+   sprintf(message2, "ATCL Speed: %3.0f km/h", vehicleVelocityKph);
+   sprintf(message3, "Set  Amp:   %4.1f  A", vehicleData_.driverSetCurrent);
+   const float driverSetSpeedKph = vehicleData_.driverSetSpeedRpm * CcsDefines::RPM_TO_KPH_CONVERSION;
+   sprintf(message4, "Set Speed:  %3.1f km/h", driverSetSpeedKph);
 
    charDisplay_.setLine(1);
    charDisplay_.writeMessage(message1,20);

@@ -4,23 +4,18 @@
    Copyright (c) 2014 by University of Calgary Solar Car Team
 -------------------------------------------------------*/
 
-// Solar car includes
+#include <CcsDefines.h>
 #include <DriverControl.h>
 #include <VehicleData.h>
 
+using namespace CcsDefines;
+
 namespace
 {
-   // Control parameters
-   // Wavesculptor 22 requires velocity in RPM
-   const unsigned int MAX_FORWARD_RPM = 1000; //Was 1298 on old system
-   const unsigned int MAX_REVERSE_RPM = 200;
-   const unsigned int MAX_CURRENT_AMPS = 80;
-   //RPM to Kph is wheel diameter * pi * 60 s / 1000 m
-   const float RPM_TO_KPH_CONVERSION = 0.545 * 3.14159265358979323 * 60.0 / 1000.0;
    const float MAX_CURRENT = 1.0f;
 
    const float NON_ZERO_THRESHOLD = 0.05f;
-   const float MAX_SPEED_TO_CHANGE_DIRECTIONS = 3.0f;
+   const float MAX_SPEED_TO_CHANGE_DIRECTIONS = 1.0f; // 1 m/s or 3.6 km/h
 }
 
 DriverControl::DriverControl(PinName deadmanInput,
@@ -51,7 +46,6 @@ DriverControl::DriverControl(PinName deadmanInput,
       runningAverageCurrentData_[i] = 0.0f;
       runningAverageCarDirectionData_[i] = 0;
    }
-    vehicleData_.pc.printf("Init Driver control\n");
 }
 
 void DriverControl::initializeDriverControls()
@@ -71,13 +65,12 @@ void DriverControl::readDriverControls()
    const int directionInput = directionInput_;
 
    if(vehicleData_.carDirection != directionInput &&
-      vehicleData_.vehicleVelocityKph > MAX_SPEED_TO_CHANGE_DIRECTIONS)
+      vehicleData_.vehicleVelocity > MAX_SPEED_TO_CHANGE_DIRECTIONS)
    {
       //Safety measure. Not allow changing direction at speed. Stop car.
-      vehicleData_.driverSetCurrent = 0.0f;
+      vehicleData_.driverSetCurrentPercentage = 0.0f;
       vehicleData_.driverSetSpeedRpm = 0.0f;
-      vehicleData_.driverSetCurrentA = 0.0f;
-      vehicleData_.driverSetSpeedKph = 0.0f;
+      vehicleData_.driverSetCurrent = 0.0f;
    }
    else
    {
@@ -92,7 +85,7 @@ void DriverControl::setSpeedAndCurrent()
  // removed until deadmans are physically implemented
  //  if(vehicleData_.deadmanPressed)
 //   {
-      if(vehicleData_.carDirection == VehicleDataEnums::FORWARD)
+      if(vehicleData_.carDirection == VehicleDataEnums::Forward)
       {
          setForwardSpeedAndCurrent();
       }
@@ -103,10 +96,9 @@ void DriverControl::setSpeedAndCurrent()
 //   }
 //   else
 //   {
-//      vehicleData_.driverSetCurrent = 0.0f;
+//      vehicleData_.driverSetCurrentPercentage = 0.0f;
 //      vehicleData_.driverSetSpeedRpm = 0.0f;
-//      vehicleData_.driverSetSpeedKph = 0;
-//      vehicleData_.driverSetCurrentA = 0.0f;
+//      vehicleData_.driverSetCurrent = 0.0f;
 //   }
 }
 
@@ -148,15 +140,13 @@ void DriverControl::setForwardSpeedAndCurrent()
    addLatestToRunningAverage(runningAverageRpmData_, currentIndexRpmDataAverage_, checkIfAboveZeroThreshold(velocityInput_) * MAX_FORWARD_RPM);
    addLatestToRunningAverage(runningAverageCurrentData_, currentIndexCurrentDataAverage_, checkIfAboveZeroThreshold(currentInput_) * MAX_CURRENT);
    vehicleData_.driverSetSpeedRpm = calculateRunningAverage(runningAverageRpmData_);
-   vehicleData_.driverSetCurrent = calculateRunningAverage(runningAverageCurrentData_);
-   vehicleData_.driverSetSpeedKph = vehicleData_.driverSetSpeedRpm * RPM_TO_KPH_CONVERSION;
-   vehicleData_.driverSetCurrentA = vehicleData_.driverSetCurrent * MAX_CURRENT_AMPS;
+   vehicleData_.driverSetCurrentPercentage = calculateRunningAverage(runningAverageCurrentData_);
+   vehicleData_.driverSetCurrent = vehicleData_.driverSetCurrentPercentage * MAX_CURRENT_AMPS;
 }
 
 void DriverControl::setReverseSpeedAndCurrent()
 {
    vehicleData_.driverSetSpeedRpm = -checkIfAboveZeroThreshold(velocityInput_) * MAX_REVERSE_RPM;
-   vehicleData_.driverSetCurrent = checkIfAboveZeroThreshold(currentInput_) * MAX_CURRENT;
-   vehicleData_.driverSetSpeedKph = -vehicleData_.driverSetSpeedRpm * RPM_TO_KPH_CONVERSION;
-   vehicleData_.driverSetCurrentA = vehicleData_.driverSetCurrent * MAX_CURRENT_AMPS;
+   vehicleData_.driverSetCurrentPercentage = checkIfAboveZeroThreshold(currentInput_) * MAX_CURRENT;
+   vehicleData_.driverSetCurrent = vehicleData_.driverSetCurrentPercentage * MAX_CURRENT_AMPS;
 }

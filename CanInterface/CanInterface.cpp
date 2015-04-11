@@ -1,7 +1,7 @@
 /*-------------------------------------------------------
    Made for the ccs mbed LPC-1768
    By Jordan Heinrichs on for the Solar Car Team
-   Copyright (c) 2014 by University of Calgary Solar Car Team 
+   Copyright (c) 2014 by University of Calgary Solar Car Team
 -------------------------------------------------------*/
 
 // Solar car includes
@@ -10,7 +10,7 @@
 
 //This structure the basic format of how the tritium sends its data.
 //Unfortunatly it is not completely portable and you have to be very careful about the endianess
-union TritiumDataFormatter 
+union TritiumDataFormatter
 {
    float floatData[2];
    unsigned char unsignedCharData[8];
@@ -49,7 +49,7 @@ namespace
       packFanStatus = 0x06FC,
       extendedPackStatus = 0x06FD,
    };
-  
+
 // Driver controls CAN base address and packet offsets
    const unsigned int DRIVER_CONTROL_CAN_BASE = 0x500;
    const unsigned int MOTOR_DRIVE = 1;
@@ -72,8 +72,6 @@ namespace
    const unsigned int RESET = 25;
 
    const unsigned int DEVICE_SERIAL_NUMBER = 0x01;
-
-   const float METER_PER_SECOND_TO_KPH_CONVERSION = 3.6;
 }
 
 CanInterface::CanInterface(PinName canTd,
@@ -97,7 +95,7 @@ void CanInterface::initInterface()
 
    sendConfigurationMessage();
    sendSetbusCurrentALimitTo100Percent();
-   
+
    wait_ms(10);
 
    sendResetMotorControllerOne();
@@ -219,24 +217,24 @@ void CanInterface::sendSetVelocityAndCurrent()
    unsigned int canAddress = DRIVER_CONTROL_CAN_BASE + MOTOR_DRIVE;
 
    float dataToSendFloat[2] ;
-   
+
    dataToSendFloat[0] = vehicleData_.driverSetSpeedRpm;
-   dataToSendFloat[1] = vehicleData_.driverSetCurrent;
+   dataToSendFloat[1] = vehicleData_.driverSetCurrentPercentage;
 
    char dataToSendChar[8];
 
    writeFloatArrayToCharArray(dataToSendFloat, dataToSendChar);
 
    CANMessage velocityAndCurrent(canAddress, dataToSendChar);
-   motorControllerCan_.write(velocityAndCurrent);     
-   
+   motorControllerCan_.write(velocityAndCurrent);
+
 }
 
 void CanInterface::sendSetbusCurrentALimitTo100Percent()
 {
    unsigned int canAddress = DRIVER_CONTROL_CAN_BASE + POWER;
    float dataToSendFloat[2] ;
-   
+
    dataToSendFloat[0] = 0.0f;
    dataToSendFloat[1] = 1.0f;
 
@@ -258,7 +256,7 @@ void CanInterface::sendResetMotorControllerOne()
 
    CANMessage motorReset(canAddress, messageDataFormatted.charData);
    motorControllerCan_.write(motorReset);
-   
+
    canAddress = 0x503;
    CANMessage motorReset2(canAddress, messageDataFormatted.charData);
    motorControllerCan_.write(motorReset2);
@@ -268,7 +266,7 @@ void CanInterface::sendResetMotorControllerOne()
 void CanInterface::sendResetMotorControllerTwo()
 {
    unsigned int canAddress = MOTOR_TWO_BASE + RESET;
-   
+
    TritiumDataFormatter messageDataFormatted;
    messageDataFormatted.unsignedLongData[1] = 0x00535754;
    messageDataFormatted.unsignedLongData[0] = 0x45534552;
@@ -307,7 +305,7 @@ void CanInterface::readbusCurrentA(const unsigned char* messageData)
 {
    float receivedData[2];
    writeCharArrayToFloat(messageData, receivedData);
-   vehicleData_.busCurrentA = receivedData[1];
+   vehicleData_.busCurrent = receivedData[1];
    vehicleData_.busVoltage = receivedData[0];
 }
 
@@ -315,7 +313,7 @@ void CanInterface::readVelocity(const unsigned char* messageData)
 {
    float receivedData[2];
    writeCharArrayToFloat(messageData, receivedData);
-   vehicleData_.vehicleVelocityKph = receivedData[1] * METER_PER_SECOND_TO_KPH_CONVERSION;
+   vehicleData_.vehicleVelocity = receivedData[1];
    vehicleData_.motorVelocityRpm = receivedData[0];
 }
 

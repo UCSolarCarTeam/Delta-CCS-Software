@@ -38,7 +38,7 @@ private:
    // Add checksum into data at index length and length + 1
    void addChecksum(unsigned char* data, unsigned int length);
 
-   void writeFloatIntoData(unsigned char* data, int index, float& value);
+   void writeFloatIntoData(unsigned char* data, int index, const float& value);
    void sendData(const unsigned char* data, int length);
 
 private:

@@ -7,12 +7,11 @@
 #include <VehicleData.h>
 
 VehicleData::VehicleData()
-: actualCurrentA(0.0f)
-, driverSetCurrentA(0.0f)
-, driverSetSpeedKph(0.0f)
-, busCurrentA(0.0f)
+: reportedMotorCurrent(0.0f)
+, driverSetCurrent(0.0f)
+, busCurrent(0.0f)
 , busVoltage(0.0f)
-, vehicleVelocityKph(0.0f)
+, vehicleVelocity(0.0f)
 , motorVelocityRpm(0.0f)
 , phaseCCurrent(0.0f)
 , phaseBCurrent(0.0f)
@@ -32,8 +31,6 @@ VehicleData::VehicleData()
 , errorFlags(0)
 , limitFlags(0)
 , bmuStatusFlagsExtended(0)
-, bluetoothConnected(false)
-, faultDetected(false)
 , pc(USBTX, USBRX)
 {
 }

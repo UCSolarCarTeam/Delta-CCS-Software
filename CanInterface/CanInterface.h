@@ -1,7 +1,7 @@
 /*-------------------------------------------------------
    Made for the ccs mbed LPC-1768
    By Jordan Heinrichs on for the Solar Car Team
-   Copyright (c) 2014 by University of Calgary Solar Car Team 
+   Copyright (c) 2014 by University of Calgary Solar Car Team
 -------------------------------------------------------*/
 
 #pragma once
@@ -27,7 +27,7 @@ public:
 
 private:
    void readCan();
-   
+
    void sendSetbusCurrentALimitTo100Percent();
    void sendSetVelocityAndCurrent();
    void sendResetMotorControllerOne();
@@ -61,6 +61,6 @@ private:
 private:
    CAN motorControllerCan_;
    CAN mpptCan_;
-   
+
    VehicleData& vehicleData_;
 };

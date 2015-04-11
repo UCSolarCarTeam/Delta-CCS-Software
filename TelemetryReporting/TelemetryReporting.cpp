@@ -6,6 +6,7 @@
 
 #define BLUETOOTH 0
 
+#include <CcsDefines.h>
 #include <CrcCalculator.h>
 #include <TelemetryReporting.h>
 #include <VehicleData.h>
@@ -58,9 +59,6 @@ void TelemetryReporting::initTelemetryReporting()
    uart_.baud(BLUETOOTH_BAUD_RATE);
    uart_.format(BLUETOOTH_NUMBER_OF_BITS, BLUETOOTH_PARITY, BLUETOOTH_STOP_BIT);
 
-  // For future use to receive data from chase car.
-  // uart_.attach(this, &TelemetryReporting::readBluetooth);
-
    uart_.puts(GET_BLUETOOTH_STATUS);
 
    uart_.puts("SET BT AUTH * 0001\n");
@@ -87,11 +85,12 @@ void TelemetryReporting::sendKeyDriverControlTelemetry()
    const unsigned int unframedPacketLength = KEY_DRIVER_CONTROL_LENGTH + CHECKSUM_LENGTH;
    unsigned char packetPayload[unframedPacketLength];
    packetPayload[0] = KEY_DRIVER_CONTROL_ID;
-   writeFloatIntoData(packetPayload, 1, vehicleData_.actualSpeedRpm); //todo send m/s
-   writeFloatIntoData(packetPayload, 5, vehicleData_.driverSetCurrentA);
-   writeFloatIntoData(packetPayload, 9, vehicleData_.busCurrentA);
+   const float driverSetSpeedMps = vehicleData_.driverSetSpeedRpm * CcsDefines::RPM_TO_MPS_CONVERSION;
+   writeFloatIntoData(packetPayload, 1, driverSetSpeedMps);
+   writeFloatIntoData(packetPayload, 5, vehicleData_.driverSetCurrent);
+   writeFloatIntoData(packetPayload, 9, vehicleData_.busCurrent);
    writeFloatIntoData(packetPayload, 13, vehicleData_.busVoltage);
-   writeFloatIntoData(packetPayload, 17, vehicleData_.vehicleVelocityKph);
+   writeFloatIntoData(packetPayload, 17, vehicleData_.vehicleVelocity);
 
    addChecksum(packetPayload, KEY_DRIVER_CONTROL_LENGTH);
    unsigned char packet[unframedPacketLength + FRAMING_LENGTH_INCREASE];
@@ -230,7 +229,7 @@ void TelemetryReporting::addChecksum(unsigned char* data, unsigned int length)
    data[length + 1] = static_cast<unsigned char>(0xFF & (crc16 >> 8));
 }
 
-void TelemetryReporting::writeFloatIntoData(unsigned char* data, int index, float& value)
+void TelemetryReporting::writeFloatIntoData(unsigned char* data, int index, const float& value)
 {
    FloatDataUnion floatDataUnion;
    floatDataUnion.floatData = value;
