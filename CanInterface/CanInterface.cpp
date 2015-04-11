@@ -74,15 +74,19 @@ namespace
    const unsigned int DEVICE_SERIAL_NUMBER = 0x01;
 }
 
-CanInterface::CanInterface(PinName canTd,
-                           PinName canRd,
-                           PinName canMpptTd,
-                           PinName canMpptRd,
+CanInterface::CanInterface(const PinName& canTd,
+                           const PinName& canRd,
+                           const PinName& canMpptTd,
+                           const PinName& canMpptRd,
+                           const PinName& resetPin,
                            VehicleData& vehicleData)
 : motorControllerCan_(canRd, canTd)
 , mpptCan_(canMpptRd, canMpptTd)
+, resetInput_(resetPin)
+, resetMotorControllers_(false)
 , vehicleData_(vehicleData)
 {
+   resetInput_.rise(this, &CanInterface::resetMotorControllers);
 }
 
 void CanInterface::initInterface()
@@ -97,9 +101,6 @@ void CanInterface::initInterface()
    sendSetbusCurrentALimitTo100Percent();
 
    wait_ms(10);
-
-   sendResetMotorControllerOne();
-   sendResetMotorControllerTwo();
 }
 
 void CanInterface::readCan()
@@ -205,6 +206,10 @@ void CanInterface::readCan()
 
 void CanInterface::sendCanData()
 {
+   if (resetMotorControllers_)
+   {
+      resetMotorControllers();
+   }
    sendSetVelocityAndCurrent();
 }
 
@@ -214,9 +219,9 @@ void CanInterface::sendCanData()
 //31-0 Velocity RPM
 void CanInterface::sendSetVelocityAndCurrent()
 {
-   unsigned int canAddress = DRIVER_CONTROL_CAN_BASE + MOTOR_DRIVE;
+   const unsigned int canAddress = DRIVER_CONTROL_CAN_BASE + MOTOR_DRIVE;
 
-   float dataToSendFloat[2] ;
+   float dataToSendFloat[2];
 
    dataToSendFloat[0] = vehicleData_.driverSetSpeedRpm;
    dataToSendFloat[1] = vehicleData_.driverSetCurrentPercentage;
@@ -227,13 +232,12 @@ void CanInterface::sendSetVelocityAndCurrent()
 
    CANMessage velocityAndCurrent(canAddress, dataToSendChar);
    motorControllerCan_.write(velocityAndCurrent);
-
 }
 
 void CanInterface::sendSetbusCurrentALimitTo100Percent()
 {
-   unsigned int canAddress = DRIVER_CONTROL_CAN_BASE + POWER;
-   float dataToSendFloat[2] ;
+   const unsigned int canAddress = DRIVER_CONTROL_CAN_BASE + POWER;
+   float dataToSendFloat[2];
 
    dataToSendFloat[0] = 0.0f;
    dataToSendFloat[1] = 1.0f;
@@ -246,9 +250,14 @@ void CanInterface::sendSetbusCurrentALimitTo100Percent()
    motorControllerCan_.write(busLimit);
 }
 
+void CanInterface::requestResetOfMotorControllers()
+{
+   resetMotorControllers_ = true;
+}
+
 void CanInterface::sendResetMotorControllerOne()
 {
-   unsigned int canAddress = MOTOR_ONE_BASE + RESET;
+   const unsigned int canAddress = MOTOR_ONE_BASE + RESET;
 
    TritiumDataFormatter messageDataFormatted;
    messageDataFormatted.unsignedLongData[1] = 0x00535754;
@@ -257,15 +266,14 @@ void CanInterface::sendResetMotorControllerOne()
    CANMessage motorReset(canAddress, messageDataFormatted.charData);
    motorControllerCan_.write(motorReset);
 
-   canAddress = 0x503;
-   CANMessage motorReset2(canAddress, messageDataFormatted.charData);
-   motorControllerCan_.write(motorReset2);
-
+   const unsigned int legacyResetCanAddress = 0x503;
+   CANMessage motorResetLegacy(legacyResetCanAddress, messageDataFormatted.charData);
+   motorControllerCan_.write(motorResetLegacy);
 }
 
 void CanInterface::sendResetMotorControllerTwo()
 {
-   unsigned int canAddress = MOTOR_TWO_BASE + RESET;
+   const unsigned int canAddress = MOTOR_TWO_BASE + RESET;
 
    TritiumDataFormatter messageDataFormatted;
    messageDataFormatted.unsignedLongData[1] = 0x00535754;
@@ -275,9 +283,16 @@ void CanInterface::sendResetMotorControllerTwo()
    motorControllerCan_.write(motorReset);
 }
 
+void CanInterface::resetMotorControllers()
+{
+   sendResetMotorControllerOne();
+   sendResetMotorControllerTwo();
+   resetMotorControllers_ = false;
+}
+
 void CanInterface::sendConfigurationMessage()
 {
-   unsigned int canAddress = DRIVER_CONTROL_CAN_BASE;
+   const unsigned int canAddress = DRIVER_CONTROL_CAN_BASE;
    char data[8];
    data[7] = 'T';
    data[6] = 'R';

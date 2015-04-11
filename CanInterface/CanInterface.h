@@ -16,10 +16,11 @@ union TritiumDataFormatter;
 class CanInterface
 {
 public:
-   CanInterface(PinName canTd,
-                PinName canRd,
-                PinName canMpptTd,
-                PinName canMpptRd,
+   CanInterface(const PinName& canTd,
+                const PinName& canRd,
+                const PinName& canMpptTd,
+                const PinName& canMpptRd,
+                const PinName& resetPin,
                 VehicleData& vehicleData);
 
    void initInterface();
@@ -30,8 +31,12 @@ private:
 
    void sendSetbusCurrentALimitTo100Percent();
    void sendSetVelocityAndCurrent();
+
+   void requestResetOfMotorControllers();
    void sendResetMotorControllerOne();
    void sendResetMotorControllerTwo();
+   void resetMotorControllers();
+
    void sendConfigurationMessage();
 
    void readStatus(const unsigned char* messageData);
@@ -58,9 +63,12 @@ private:
    void writeFloatArrayToCharArray(const float* input, char* output);
    void writeCharArrayToFloat(const unsigned char* input, float* output);
    void populateTritiumDataFormatter(const unsigned char* input, TritiumDataFormatter& output);
+
 private:
    CAN motorControllerCan_;
    CAN mpptCan_;
+   InterruptIn resetInput_;
+   volatile bool resetMotorControllers_;
 
    VehicleData& vehicleData_;
 };
