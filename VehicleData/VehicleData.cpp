@@ -1,7 +1,7 @@
 /*-------------------------------------------------------
    Made for the ccs mbed LPC-1768
    By Jordan Heinrichs on for the Solar Car Team
-   Copyright (c) 2014 by University of Calgary Solar Car Team 
+   Copyright (c) 2014 by University of Calgary Solar Car Team
 -------------------------------------------------------*/
 
 #include <VehicleData.h>
@@ -32,7 +32,6 @@ VehicleData::VehicleData()
 , errorFlags(0)
 , limitFlags(0)
 , bmuStatusFlagsExtended(0)
-, headlightOn(false)
 , bluetoothConnected(false)
 , faultDetected(false)
 , pc(USBTX, USBRX)

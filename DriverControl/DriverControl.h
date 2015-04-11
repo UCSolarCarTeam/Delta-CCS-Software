@@ -1,7 +1,7 @@
 /*-------------------------------------------------------
    Made for the ccs mbed LPC-1768
    By Jordan Heinrichs on for the Solar Car Team
-   Copyright (c) 2014 by University of Calgary Solar Car Team 
+   Copyright (c) 2014 by University of Calgary Solar Car Team
 -------------------------------------------------------*/
 
 #pragma once
@@ -20,7 +20,6 @@ public:
                  PinName rightBlinkerInput,
                  PinName leftBlinkerInput,
                  PinName brakeInput,
-                 PinName headlightInput,
                  PinName currentInput,
                  PinName velocityInput,
                  PinName directionInput,
@@ -32,7 +31,7 @@ public:
 private:
    void setSpeedAndCurrent();
    float checkIfAboveZeroThreshold(const float input);
-   
+
    float calculateRunningAverage(const float* averageData);
    void addLatestToRunningAverage(float* averageData, int& currentIndex, float newData);
 
@@ -45,14 +44,13 @@ private:
    DigitalIn rightBlinkerInput_;
    DigitalIn leftBlinkerInput_;
    DigitalIn brakeInput_;
-   DigitalIn headlightInput_;
    DigitalIn directionInput_;
 
    AnalogIn currentInput_;
    AnalogIn velocityInput_;
 
    VehicleData& vehicleData_;
-   
+
    float runningAverageRpmData_[5];
    int currentIndexRpmDataAverage_;
    float runningAverageCurrentData_[5];

@@ -1,7 +1,7 @@
 /*-------------------------------------------------------
    Made for the ccs mbed LPC-1768
    By Jordan Heinrichs on for the Solar Car Team
-   Copyright (c) 2014 by University of Calgary Solar Car Team 
+   Copyright (c) 2014 by University of Calgary Solar Car Team
 -------------------------------------------------------*/
 
 // Solar car includes
@@ -28,7 +28,6 @@ DriverControl::DriverControl(PinName deadmanInput,
                              PinName rightBlinkerInput,
                              PinName leftBlinkerInput,
                              PinName brakeInput,
-                             PinName headlightInput,
                              PinName currentInput,
                              PinName velocityInput,
                              PinName directionInput,
@@ -38,7 +37,6 @@ DriverControl::DriverControl(PinName deadmanInput,
 , rightBlinkerInput_(rightBlinkerInput)
 , leftBlinkerInput_(leftBlinkerInput)
 , brakeInput_(brakeInput)
-, headlightInput_(headlightInput)
 , directionInput_(directionInput)
 , currentInput_(currentInput)
 , velocityInput_(velocityInput)
@@ -67,7 +65,6 @@ void DriverControl::readDriverControls()
    vehicleData_.hazardsActivated = hazardsInput_;
    vehicleData_.rightBlinkerActivated = rightBlinkerInput_;
    vehicleData_.leftBlinkerActivated = leftBlinkerInput_;
-   vehicleData_.headlightOn = headlightInput_;
    vehicleData_.brakelightOn = brakeInput_;
    vehicleData_.hazardsActivated = hazardsInput_;
 
@@ -130,9 +127,9 @@ float DriverControl::calculateRunningAverage(const float* averageData)
    float total = 0.0;
    for(int i = 0; i < 5; i++)
    {
-       total += averageData[i]; 
+       total += averageData[i];
    }
-   
+
    return total / 5.0;
 }
 
@@ -143,7 +140,7 @@ void DriverControl::addLatestToRunningAverage(float* averageData, int& currentIn
    if(currentIndex >= 5)
    {
       currentIndex = 0;
-   }   
+   }
 }
 
 void DriverControl::setForwardSpeedAndCurrent()

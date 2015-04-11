@@ -3,10 +3,8 @@
 
 #include <Dashboard.h>
 
-Dashboard::Dashboard(PinName mosi, PinName miso, PinName clock, PinName chipSelectCharDisplay,
-            PinName chipSelectGraphicDisplay, PinName graphicDisplayDataSignal,
-            PinName graphicDisplayReset,
-            VehicleData& vehicleData)
+Dashboard::Dashboard(PinName mosi, PinName miso, PinName clock,
+   PinName chipSelectCharDisplay, VehicleData& vehicleData)
 : serialCommunication_(mosi, miso, clock)
 , charDisplay_(&serialCommunication_, chipSelectCharDisplay)
 , vehicleData_(vehicleData)

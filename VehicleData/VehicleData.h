@@ -81,7 +81,6 @@ struct VehicleData
    //Light fields
    bool leftBlinkerActivated;
    bool rightBlinkerActivated;
-   bool headlightOn;
    bool brakelightOn;
    bool hazardsActivated;
 

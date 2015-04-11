@@ -1,10 +1,9 @@
+#pragma once
 /*-------------------------------------------------------
    Made for the ccs mbed LPC-1768
    By Jordan Heinrichs on for the Solar Car Team
-   Copyright (c) 2014 by University of Calgary Solar Car Team 
+   Copyright (c) 2014 by University of Calgary Solar Car Team
 -------------------------------------------------------*/
-
-#pragma once
 
 #include <VehicleData.h>
 #include <TelemetryReporting.h>
@@ -30,7 +29,7 @@ private:
    Dashboard dashboard_;
    TelemetryReporting telemetryReporting_;
    LedBmuErrorOutputService ledBmuErrorOutputService_;
-   
+
    int telemetryTimer_;
    int displayTimer_;
 };
