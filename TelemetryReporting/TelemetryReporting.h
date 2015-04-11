@@ -44,4 +44,5 @@ private:
 private:
    RawSerial uart_;
    VehicleData& vehicleData_;
+   int timer_;
 };

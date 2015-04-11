@@ -88,16 +88,16 @@ void Ccs::performActions()
    canInterface_.sendCanData();
    lights_.updateLights();
 
-   //At 120 ms this would be sending telemetry at the rate of every 5 seconds
-   if(telemetryTimer_ >= 42)
+   //At 60 ms this would be sending telemetry at the rate of every 0.5 seconds
+   if(telemetryTimer_ >= 8)
    {
       telemetryReporting_.transmitTelemetry();
       ledBmuErrorOutputService_.updateLeds();
       telemetryTimer_ = 0;
    }
 
-   //At 120 ms this would be updating the display at the rate of 4.1 Hz
-   if(displayTimer_ >= 2)
+   //At 60 ms this would be updating the display at the rate of 4.1 Hz
+   if(displayTimer_ >= 4)
    {
       dashboard_.displayDashboard();
       displayTimer_ = 0;

@@ -50,6 +50,7 @@ TelemetryReporting::TelemetryReporting(PinName uartTx,
                                        VehicleData& vehicleData)
 : uart_(uartTx, uartRx)
 , vehicleData_(vehicleData)
+, timer_(0)
 {
 }
 
@@ -60,24 +61,46 @@ void TelemetryReporting::initTelemetryReporting()
    uart_.format(BLUETOOTH_NUMBER_OF_BITS, BLUETOOTH_PARITY, BLUETOOTH_STOP_BIT);
 
    uart_.puts(GET_BLUETOOTH_STATUS);
-
    uart_.puts("SET BT AUTH * 0001\n");
-
    uart_.puts("SET BT PAGEMODE 3 3000 1\n");
 #endif
 }
 
 void TelemetryReporting::transmitTelemetry()
 {
-   // todo, send at different frequencies
    sendKeyDriverControlTelemetry();
-   sendDriverControlDetails();
    sendFaults();
-   sendBatteryData();
-   sendCmuData(0);
-   sendCmuData(1);
-   sendCmuData(2);
-   sendCmuData(3);
+
+   switch (timer_)
+   {
+   case 0:
+      sendDriverControlDetails();
+      break;
+   case 1:
+      sendBatteryData();
+      break;
+   case 2:
+      sendCmuData(0);
+      break;
+   case 3:
+      sendCmuData(1);
+      break;
+   case 4:
+      sendCmuData(2);
+      break;
+   case 5:
+      sendCmuData(3);
+      break;
+   }
+
+   if (timer_ >= 5)
+   {
+      timer_ = 0;
+   }
+   else
+   {
+      timer_++;
+   }
 }
 
 void TelemetryReporting::sendKeyDriverControlTelemetry()
