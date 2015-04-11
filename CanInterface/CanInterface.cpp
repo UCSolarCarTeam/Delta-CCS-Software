@@ -4,7 +4,6 @@
    Copyright (c) 2014 by University of Calgary Solar Car Team
 -------------------------------------------------------*/
 
-// Solar car includes
 #include <CanInterface.h>
 #include <VehicleData.h>
 

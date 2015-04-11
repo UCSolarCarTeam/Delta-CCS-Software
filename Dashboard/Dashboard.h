@@ -13,16 +13,31 @@ class VehicleData;
 class Dashboard
 {
 public:
-   Dashboard(PinName mosi, PinName miso, PinName clock,
-      PinName chipSelectCharDisplay, VehicleData& vehicleData);
+   Dashboard(
+      const PinName& mosi,
+      const PinName& miso,
+      const PinName& clock,
+      const PinName& chipSelectChar1Display,
+      const PinName& chipSelectChar2Display,
+      const PinName& chipSelectChar3Display,
+      const VehicleData& vehicleData);
 
    void initAll();
-   void displayTest();
-   void displayDashboard();
+   void updateDashboard();
+
+private:
+   void updateDisplay1();
+   void updateDisplay2();
+   void updateDisplay3();
+   void displayTest(CharDisplay& display);
 
 private:
    SPI serialCommunication_;
-   CharDisplay charDisplay_;
+   CharDisplay charDisplay1_;
+   CharDisplay charDisplay2_;
+   CharDisplay charDisplay3_;
 
-   VehicleData& vehicleData_;
+   int timer_;
+
+   const VehicleData& vehicleData_;
 };

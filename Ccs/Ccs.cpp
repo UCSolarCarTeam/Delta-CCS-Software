@@ -18,8 +18,8 @@ namespace
    const PinName& CAN_MPPT_RD = p9;
    const PinName& CAN_MPPT_TD = p10;
 
-   // const PinName& PIN_DISPLAY_CHAR_2_CS = p11;
-   // const PinName& PIN_DISPLAY_CHAR_3_CS = p12;
+   const PinName& PIN_DISPLAY_CHAR_2_CS = p11;
+   const PinName& PIN_DISPLAY_CHAR_3_CS = p12;
 
    // const PinName& REGEN_INPUT = p13;
    const PinName& PIN_DEADMAN_INPUT = p14;
@@ -70,6 +70,8 @@ Ccs::Ccs()
              PIN_DISPLAY_MISO,
              PIN_DISPLAY_CLOCK,
              PIN_DISPLAY_CHAR_1_CS,
+             PIN_DISPLAY_CHAR_2_CS,
+             PIN_DISPLAY_CHAR_3_CS,
              vehicleData_)
 , telemetryReporting_(PIN_RADIO_UART_TX,
                       PIN_RADIO_UART_RX,
@@ -103,10 +105,10 @@ void Ccs::performActions()
       telemetryTimer_ = 0;
    }
 
-   //At 60 ms this would be updating the display at the rate of 4.1 Hz
-   if(displayTimer_ >= 4)
+   //At 60 ms this would be updating the display at the rate of 2.5 Hz
+   if(displayTimer_ >= 2)
    {
-      dashboard_.displayDashboard();
+      dashboard_.updateDashboard();
       displayTimer_ = 0;
    }
 

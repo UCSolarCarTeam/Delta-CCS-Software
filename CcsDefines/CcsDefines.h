@@ -17,4 +17,6 @@ namespace CcsDefines
    const float RPM_TO_KPH_CONVERSION = 0.545 * 3.14159265358979323 * 60.0 / 1000.0;
    const float RPM_TO_MPS_CONVERSION = 0.545 * 3.14159265358979323 / 60.0;
    const float MPS_KPH_CONVERSION = 3.6;
+   const unsigned int MAJOR_BMU_ERROR_MASK = 0x1C37;
+   const unsigned int MAJOR_MC_ERROR_MASK = 0xFF;
 }
