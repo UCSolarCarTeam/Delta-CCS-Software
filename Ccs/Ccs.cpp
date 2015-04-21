@@ -21,9 +21,9 @@ namespace
    const PinName& PIN_DISPLAY_CHAR_2_CS = p11;
    const PinName& PIN_DISPLAY_CHAR_3_CS = p12;
 
-   // const PinName& REGEN_INPUT = p13;
+   // const PinName& UNUSED = p13;
    const PinName& PIN_DEADMAN_INPUT = p14;
-   const PinName& PIN_VELOCITY_INPUT = p15;
+   const PinName& PIN_REGEN_INPUT = p15;
    const PinName& PIN_CURRENT_INPUT = p16;
 
    const PinName& PIN_CAR_DIRECTION_INPUT = p17;
@@ -63,7 +63,7 @@ Ccs::Ccs()
                  PIN_LIGHTS_LEFT_BLINKER_INPUT,
                  PIN_LIGHTS_BRAKE_INPUT,
                  PIN_CURRENT_INPUT,
-                 PIN_VELOCITY_INPUT,
+                 PIN_REGEN_INPUT,
                  PIN_CAR_DIRECTION_INPUT,
                  vehicleData_)
 , dashboard_(PIN_DISPLAY_MOSI,

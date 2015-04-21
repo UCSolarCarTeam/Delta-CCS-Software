@@ -18,10 +18,9 @@ struct VehicleData
 {
    VehicleData();
 
+   //Driver inputs
    float reportedMotorCurrent;
    float driverSetCurrent;
-
-   //Driver inputs
    float driverSetCurrentPercentage;
    float driverSetSpeedRpm;
    bool deadmanPressed;
