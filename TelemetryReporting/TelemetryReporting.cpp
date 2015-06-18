@@ -19,12 +19,10 @@ union FloatDataUnion
 
 namespace
 {
-   unsigned int BLUETOOTH_BAUD_RATE = 115200;
-   unsigned int BLUETOOTH_NUMBER_OF_BITS = 8;
-   unsigned int BLUETOOTH_STOP_BIT = 1;
-   SerialBase::Parity BLUETOOTH_PARITY = SerialBase::None;
-
-   const char GET_BLUETOOTH_STATUS[] = "AT\n";
+   unsigned int BAUD_RATE = 115200;
+   unsigned int NUMBER_OF_BITS = 8;
+   unsigned int STOP_BIT = 1;
+   SerialBase::Parity PARITY = SerialBase::None;
 
    // These lengths only include the data. Not the checksum
    const unsigned int KEY_DRIVER_CONTROL_LENGTH = 21;
@@ -56,11 +54,11 @@ TelemetryReporting::TelemetryReporting(PinName uartTx,
 
 void TelemetryReporting::initTelemetryReporting()
 {
-#ifdef BLUETOOTH
-   uart_.baud(BLUETOOTH_BAUD_RATE);
-   uart_.format(BLUETOOTH_NUMBER_OF_BITS, BLUETOOTH_PARITY, BLUETOOTH_STOP_BIT);
+   uart_.baud(BAUD_RATE);
+   uart_.format(NUMBER_OF_BITS, PARITY, STOP_BIT);
 
-   uart_.puts(GET_BLUETOOTH_STATUS);
+#if BLUETOOTH
+   uart_.puts("AT\n");
    uart_.puts("SET BT AUTH * 0001\n");
    uart_.puts("SET BT PAGEMODE 3 3000 1\n");
 #endif
