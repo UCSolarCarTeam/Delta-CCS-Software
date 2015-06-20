@@ -47,36 +47,44 @@ namespace
 
 Ccs::Ccs()
 : vehicleData_()
-, lights_(PIN_LIGHTS_BRAKE_OUT,
-          PIN_LIGHTS_LEFT_BLINKER_OUT,
-          PIN_LIGHTS_RIGHT_BLINKER_OUT,
-          vehicleData_)
-, canInterface_(CAN_TD,
-                CAN_RD,
-                CAN_MPPT_TD,
-                CAN_MPPT_RD,
-                RESET_IN,
-                vehicleData_)
-, driverControl_(PIN_DEADMAN_INPUT,
-                 PIN_LIGHTS_HAZARDS_INPUT,
-                 PIN_LIGHTS_RIGHT_BLINKER_INPUT,
-                 PIN_LIGHTS_LEFT_BLINKER_INPUT,
-                 PIN_LIGHTS_BRAKE_INPUT,
-                 PIN_CURRENT_INPUT,
-                 PIN_REGEN_INPUT,
-                 PIN_CAR_DIRECTION_INPUT,
-                 vehicleData_)
-, dashboard_(PIN_DISPLAY_MOSI,
-             PIN_DISPLAY_MISO,
-             PIN_DISPLAY_CLOCK,
-             PIN_DISPLAY_CHAR_1_CS,
-             PIN_DISPLAY_CHAR_2_CS,
-             PIN_DISPLAY_CHAR_3_CS,
-             vehicleData_)
-, telemetryReporting_(PIN_RADIO_UART_TX,
-                      PIN_RADIO_UART_RX,
-                      vehicleData_)
-, ledBmuErrorOutputService_(vehicleData_)
+, lights_(
+   PIN_LIGHTS_BRAKE_OUT,
+   PIN_LIGHTS_LEFT_BLINKER_OUT,
+   PIN_LIGHTS_RIGHT_BLINKER_OUT,
+   vehicleData_)
+, motorControllerCan_(
+   CAN_TD,
+   CAN_RD,
+   RESET_IN,
+   vehicleData_)
+, mpptCan_(
+   CAN_MPPT_TD,
+   CAN_MPPT_RD,
+   vehicleData_)
+, driverControl_(
+   PIN_DEADMAN_INPUT,
+   PIN_LIGHTS_HAZARDS_INPUT,
+   PIN_LIGHTS_RIGHT_BLINKER_INPUT,
+   PIN_LIGHTS_LEFT_BLINKER_INPUT,
+   PIN_LIGHTS_BRAKE_INPUT,
+   PIN_CURRENT_INPUT,
+   PIN_REGEN_INPUT,
+   PIN_CAR_DIRECTION_INPUT,
+   vehicleData_)
+, dashboard_(
+   PIN_DISPLAY_MOSI,
+   PIN_DISPLAY_MISO,
+   PIN_DISPLAY_CLOCK,
+   PIN_DISPLAY_CHAR_1_CS,
+   PIN_DISPLAY_CHAR_2_CS,
+   PIN_DISPLAY_CHAR_3_CS,
+   vehicleData_)
+, telemetryReporting_(
+   PIN_RADIO_UART_TX,
+   PIN_RADIO_UART_RX,
+   vehicleData_)
+, ledBmuErrorOutputService_(
+   vehicleData_)
 , telemetryTimer_(0)
 , displayTimer_(0)
 {
@@ -85,7 +93,8 @@ Ccs::Ccs()
 void Ccs::initalizeActions()
 {
    driverControl_.initializeDriverControls();
-   canInterface_.initInterface();
+   motorControllerCan_.initInterface();
+   mpptCan_.initInterface();
    dashboard_.initAll();
    lights_.initalizeLights();
    telemetryReporting_.initTelemetryReporting();
@@ -94,7 +103,8 @@ void Ccs::initalizeActions()
 void Ccs::performActions()
 {
    driverControl_.readDriverControls();
-   canInterface_.sendCanData();
+   motorControllerCan_.sendCanData();
+   mpptCan_.sendCanData();
    lights_.updateLights();
 
    //At 60 ms this would be sending telemetry at the rate of every 0.5 seconds

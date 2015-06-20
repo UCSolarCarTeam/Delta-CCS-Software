@@ -52,7 +52,7 @@ void Lights::updateLights()
 
 void Lights::updateBlinkersAndHazard()
 {
-   if(timer_.read_ms() >= BLINK_TIME)
+   if(static_cast<unsigned int>(timer_.read_ms()) >= BLINK_TIME)
    {
       if(vehicleData_.hazardsActivated)
       {

@@ -7,10 +7,11 @@
 
 #include <mbed.h>
 #include <CmuData.h>
+#include <MpptData.h>
 
-namespace VehicleDataEnums
+namespace VehicleDataDefines
 {
-    enum CarDirection {Forward = 0, Reverse = 1};
+   const int NUMBER_OF_MPPTS = 7;
 }
 
 // Container for all parameters within the CCS,
@@ -18,13 +19,15 @@ struct VehicleData
 {
    VehicleData();
 
+   enum CarDirection {Forward = 0, Reverse = 1};
+
    //Driver inputs
    float reportedMotorCurrent;
    float driverSetCurrent;
    float driverSetCurrentPercentage;
    float driverSetSpeedRpm;
    bool deadmanPressed;
-   VehicleDataEnums::CarDirection carDirection;
+   VehicleData::CarDirection carDirection;
 
    //Motor Controller
    float busCurrent;
@@ -69,6 +72,9 @@ struct VehicleData
    unsigned int fanSpeed1;
    unsigned int fanCurrentConsumption;
    unsigned int cmuCurrentConsumption;
+
+   // MPPT
+   MpptData mpptData[VehicleDataDefines::NUMBER_OF_MPPTS];
 
    // Accessory power unit
    bool secondaryBatteryUnderVoltage;

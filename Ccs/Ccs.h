@@ -5,13 +5,14 @@
    Copyright (c) 2014 by University of Calgary Solar Car Team
 -------------------------------------------------------*/
 
-#include <VehicleData.h>
-#include <TelemetryReporting.h>
-#include <CanInterface.h>
-#include <DriverControl.h>
 #include <Dashboard.h>
-#include <Lights.h>
+#include <DriverControl.h>
 #include <LedBmuErrorOutputService.h>
+#include <Lights.h>
+#include <MotorControllerCan.h>
+#include <MpptCan.h>
+#include <TelemetryReporting.h>
+#include <VehicleData.h>
 
 class Ccs
 {
@@ -24,7 +25,8 @@ public:
 private:
    VehicleData vehicleData_;
    Lights lights_;
-   CanInterface canInterface_;
+   MotorControllerCan motorControllerCan_;
+   MpptCan mpptCan_;
    DriverControl driverControl_;
    Dashboard dashboard_;
    TelemetryReporting telemetryReporting_;

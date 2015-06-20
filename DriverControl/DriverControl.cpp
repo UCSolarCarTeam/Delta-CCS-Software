@@ -58,8 +58,8 @@ void DriverControl::setSpeedAndCurrent()
 {
    // This is read only once per loop because it could change due to noise if read again
    // after the safety check.
-   const VehicleDataEnums::CarDirection directionInput =
-      static_cast<VehicleDataEnums::CarDirection>(directionInput_.read());
+   const VehicleData::CarDirection directionInput =
+      static_cast<VehicleData::CarDirection>(directionInput_.read());
    if (vehicleData_.deadmanPressed &&
       isNewVehicleDirectionInputSafe(directionInput))
    {
@@ -112,10 +112,10 @@ void DriverControl::addLatestToRunningAverage(
    }
 }
 
-void DriverControl::setMovementSpeedAndCurrent(VehicleDataEnums::CarDirection direction)
+void DriverControl::setMovementSpeedAndCurrent(VehicleData::CarDirection direction)
 {
    vehicleData_.carDirection = direction;
-   if(vehicleData_.carDirection == VehicleDataEnums::Forward)
+   if(vehicleData_.carDirection == VehicleData::Forward)
    {
       vehicleData_.driverSetSpeedRpm = MAX_FORWARD_RPM;
    }
@@ -157,7 +157,7 @@ void DriverControl::readInputs()
       checkIfAboveZeroThreshold(currentInput_));
 }
 
-bool DriverControl::isNewVehicleDirectionInputSafe(VehicleDataEnums::CarDirection direction)
+bool DriverControl::isNewVehicleDirectionInputSafe(VehicleData::CarDirection direction)
 {
    return vehicleData_.carDirection == direction ||
       vehicleData_.vehicleVelocity <= MAX_SPEED_TO_CHANGE_DIRECTIONS;

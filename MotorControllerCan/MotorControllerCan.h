@@ -10,15 +10,14 @@
 class VehicleData;
 union TritiumDataFormatter;
 
-class CanInterface
+class MotorControllerCan
 {
 public:
-   CanInterface(const PinName& canTd,
-                const PinName& canRd,
-                const PinName& canMpptTd,
-                const PinName& canMpptRd,
-                const PinName& resetPin,
-                VehicleData& vehicleData);
+   MotorControllerCan(
+      const PinName& canTd,
+      const PinName& canRd,
+      const PinName& resetPin,
+      VehicleData& vehicleData);
 
    void initInterface();
    void sendCanData();
@@ -63,7 +62,6 @@ private:
 
 private:
    CAN motorControllerCan_;
-   CAN mpptCan_;
    InterruptIn resetInput_;
    volatile bool resetMotorControllers_;
 

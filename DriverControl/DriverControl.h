@@ -32,13 +32,13 @@ private:
    float calculateRunningAverage(const float* averageData);
    void addLatestToRunningAverage(float* averageData, int& currentIndex, float newData);
 
-   void setMovementSpeedAndCurrent(VehicleDataEnums::CarDirection direction);
+   void setMovementSpeedAndCurrent(VehicleData::CarDirection direction);
    void setRegenSpeedAndCurrent();
 
    void zeroDriverInputs();
    void readInputs();
 
-   bool isNewVehicleDirectionInputSafe(VehicleDataEnums::CarDirection direction);
+   bool isNewVehicleDirectionInputSafe(VehicleData::CarDirection direction);
    bool isRegenBraking();
 
 private:
