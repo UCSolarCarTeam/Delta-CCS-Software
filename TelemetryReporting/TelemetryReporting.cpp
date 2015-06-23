@@ -29,7 +29,8 @@ namespace
    const unsigned int DRIVER_CONTROL_DETAILS_LENGTH = 29;
    const unsigned int FAULT_LENGTH = 7;
    const unsigned int BATTERY_DATA_LENGTH = 18;
-   const unsigned int CMU_DATA_LENGTH = 43;
+   const unsigned int CMU_DATA_LENGTH = 42;
+   const unsigned int MPPT_DATA_LENGTH = 21;
    const unsigned int CHECKSUM_LENGTH = 2;
 
    const unsigned int FRAMING_LENGTH_INCREASE = 5;
@@ -41,6 +42,7 @@ namespace
    const unsigned char FAULT_ID = 0x03;
    const unsigned char BATTERY_DATA_ID = 0x04;
    const unsigned char CMU_DATA_ID = 0x05;
+   const unsigned char MPPT_DATA_ID = 0x06;
 }
 
 TelemetryReporting::TelemetryReporting(PinName uartTx,
@@ -73,25 +75,34 @@ void TelemetryReporting::transmitTelemetry()
    {
    case 0:
       sendDriverControlDetails();
+      sendMpptData(0);
       break;
    case 1:
       sendBatteryData();
+      sendMpptData(1);
       break;
    case 2:
       sendCmuData(0);
+      sendMpptData(2);
       break;
    case 3:
       sendCmuData(1);
+      sendMpptData(3);
       break;
    case 4:
       sendCmuData(2);
+      sendMpptData(4);
       break;
    case 5:
       sendCmuData(3);
+      sendMpptData(5);
+      break;
+   case 6:
+      sendMpptData(6);
       break;
    }
 
-   if (timer_ >= 5)
+   if (timer_ >= 6)
    {
       timer_ = 0;
    }
@@ -191,6 +202,34 @@ void TelemetryReporting::sendCmuData(unsigned char cmuDataIndex)
    writeFloatIntoData(packetPayload, 38, vehicleData_.cmuData[cmuDataIndex].cellVoltage[7]);
 
    addChecksum(packetPayload, CMU_DATA_LENGTH);
+   unsigned char packet[unframedPacketLength + FRAMING_LENGTH_INCREASE];
+   unsigned int packetLength = frameData(packetPayload, unframedPacketLength, packet);
+   sendData(packet, packetLength);
+}
+
+void TelemetryReporting::sendMpptData(unsigned char mpptDataIndex)
+{
+   const unsigned int unframedPacketLength = MPPT_DATA_LENGTH + CHECKSUM_LENGTH;
+   unsigned char packetPayload[unframedPacketLength];
+   packetPayload[0] = MPPT_DATA_ID;
+   packetPayload[1] = mpptDataIndex;
+   packetPayload[2] = static_cast<unsigned char>(vehicleData_.mpptData[mpptDataIndex].type);
+
+   if (vehicleData_.mpptData[mpptDataIndex].type == MpptData::Helianthus)
+   {
+      packetPayload[3] = 0x1F;
+   }
+   else
+   {
+      packetPayload[3] = 0x03;
+   }
+   writeFloatIntoData(packetPayload, 4, vehicleData_.mpptData[mpptDataIndex].voltageIn);
+   writeFloatIntoData(packetPayload, 8, vehicleData_.mpptData[mpptDataIndex].currentIn);
+   writeFloatIntoData(packetPayload, 12, vehicleData_.mpptData[mpptDataIndex].voltageOut);
+   writeFloatIntoData(packetPayload, 16, vehicleData_.mpptData[mpptDataIndex].currentOut);
+   packetPayload[20] = static_cast<unsigned char>(vehicleData_.mpptData[mpptDataIndex].mode);
+
+   addChecksum(packetPayload, MPPT_DATA_LENGTH);
    unsigned char packet[unframedPacketLength + FRAMING_LENGTH_INCREASE];
    unsigned int packetLength = frameData(packetPayload, unframedPacketLength, packet);
    sendData(packet, packetLength);

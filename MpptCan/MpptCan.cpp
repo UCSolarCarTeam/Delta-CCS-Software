@@ -21,7 +21,7 @@ union CanMessageFormatter
 namespace
 {
    const unsigned int CAN_FREQUENCY = 125000;
-   const int DILITHIUM_QUERY_COUNTER = 10;
+   const int DILITHIUM_QUERY_COUNTER = 20;
 
    enum Addresses
    {
@@ -86,6 +86,7 @@ void MpptCan::sendCanData()
       queryForDilithiumData();
       dilithiumQueryCounter_ = DILITHIUM_QUERY_COUNTER;
    }
+   dilithiumQueryCounter_--;
 }
 
 void MpptCan::queryForDilithiumData()
@@ -128,17 +129,11 @@ void MpptCan::readDilithiumMessage(int mpptNumber, const unsigned char* messageD
 {
    CanMessageFormatter formatter;
    populateCanMessageFormatter(messageData, formatter);
-   const float voltageIn = formatter.unsignedIntData[0] / 100.0;
-   const float currentIn = formatter.unsignedIntData[1] / 1000.0;
-   const float voltageOut = formatter.unsignedIntData[2] / 100.0;
-   const float temperature = formatter.unsignedIntData[3] / 100.0;
-
    const int mpptDataIndex = returnMpptDataIndexForMpptNumber(MpptData::Dilithium, mpptNumber);
-   vehicleData_.mpptData[mpptDataIndex].voltageIn = voltageIn;
-   vehicleData_.mpptData[mpptDataIndex].currentIn = currentIn;
-   vehicleData_.mpptData[mpptDataIndex].voltageOut = voltageOut;
+   vehicleData_.mpptData[mpptDataIndex].voltageIn = formatter.unsignedIntData[0] / 100.0;
+   vehicleData_.mpptData[mpptDataIndex].currentIn = formatter.unsignedIntData[1] / 1000.0;
+   vehicleData_.mpptData[mpptDataIndex].voltageOut = formatter.unsignedIntData[2] / 100.0;
    vehicleData_.mpptData[mpptDataIndex].currentOut = -1.0f;
-   vehicleData_.pc.printf("Mppt %d, voltageIn %f, currentIn %f, voltageOut %f, temp %f\n", mpptNumber, voltageIn, currentIn, voltageOut, temperature);
 }
 
 void MpptCan::readStatus(int mpptNumber, const unsigned char* messageData)

@@ -28,6 +28,7 @@ private:
    void sendFaults();
    void sendBatteryData();
    void sendCmuData(unsigned char cmuDataIndex);
+   void sendMpptData(unsigned char mpptDataIndex);
 
    // Will return length of framed data
    unsigned int frameData(const unsigned char* dataToEncode,
