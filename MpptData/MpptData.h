@@ -12,8 +12,8 @@ struct MpptData
 
    enum Type
    {
-      Helianthus,
-      Dilithium
+      Helianthus = 0,
+      Dilithium = 1
    };
 
    enum Mode
