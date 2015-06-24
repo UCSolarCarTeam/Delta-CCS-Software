@@ -75,6 +75,7 @@ struct VehicleData
 
    // MPPT
    MpptData mpptData[VehicleDataDefines::NUMBER_OF_MPPTS];
+   bool dynamicModeActivated;
 
    // Accessory power unit
    bool secondaryBatteryUnderVoltage;

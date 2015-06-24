@@ -26,6 +26,7 @@ private:
    void readCan();
 
    void queryForDilithiumData();
+   void sendMpptMode();
    void tryAndDecodeHelianthus(const CANMessage& receivedMessage);
 
    void writeFloatArrayToCharArray(const float* input, char* output);

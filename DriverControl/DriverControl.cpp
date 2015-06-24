@@ -23,6 +23,7 @@ DriverControl::DriverControl(const PinName& deadmanInput,
                              const PinName& currentInput,
                              const PinName& regenInput,
                              const PinName& directionInput,
+                             const PinName& mpptModeInput,
                              VehicleData& vehicleData)
 : deadmanInput_(deadmanInput)
 , hazardsInput_(hazardsInput)
@@ -33,6 +34,7 @@ DriverControl::DriverControl(const PinName& deadmanInput,
 , currentInput_(currentInput)
 , regenInput_(regenInput)
 , vehicleData_(vehicleData)
+, mpptModeInput_(mpptModeInput)
 , currentIndexRegenBrakingDataAverage_(0)
 , currentIndexCurrentDataAverage_(0)
 {
@@ -150,6 +152,7 @@ void DriverControl::readInputs()
    vehicleData_.rightBlinkerActivated = rightBlinkerInput_;
    vehicleData_.leftBlinkerActivated = leftBlinkerInput_;
    vehicleData_.brakelightOn = brakeInput_;
+   vehicleData_.dynamicModeActivated = mpptModeInput_;
 
    addLatestToRunningAverage(runningAverageRegenBrakingData_, currentIndexRegenBrakingDataAverage_,
       checkIfAboveZeroThreshold(regenInput_));

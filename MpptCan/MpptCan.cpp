@@ -28,7 +28,8 @@ namespace
       Dilithium1 = 0x0601,
       Dilithium2 = 0x0602,
       Dilithium3 = 0x0603,
-      HelianthusBase = 0x500
+      HelianthusBase = 0x500,
+      HelianthusModeSelection = 0x400
    };
 }
 
@@ -84,6 +85,7 @@ void MpptCan::sendCanData()
    if (dilithiumQueryCounter_ == 0)
    {
       queryForDilithiumData();
+      sendMpptMode();
       dilithiumQueryCounter_ = DILITHIUM_QUERY_COUNTER;
    }
    dilithiumQueryCounter_--;
@@ -97,6 +99,14 @@ void MpptCan::queryForDilithiumData()
    mpptCan_.write(message1);
    mpptCan_.write(message2);
    mpptCan_.write(message3);
+}
+
+void MpptCan::sendMpptMode()
+{
+   CANMessage message;
+   message.id = static_cast<int>(HelianthusModeSelection);
+   message.data[0] = vehicleData_.dynamicModeActivated ? MpptData::Dynamic : MpptData::Static;
+   mpptCan_.write(message);
 }
 
 void MpptCan::tryAndDecodeHelianthus(const CANMessage& receivedMessage)

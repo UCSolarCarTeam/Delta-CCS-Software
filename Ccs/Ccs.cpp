@@ -21,7 +21,7 @@ namespace
    const PinName& PIN_DISPLAY_CHAR_2_CS = p11;
    const PinName& PIN_DISPLAY_CHAR_3_CS = p12;
 
-   // const PinName& UNUSED = p13;
+   const PinName& MPPT_MODE_SWITCH = p13;
    const PinName& PIN_DEADMAN_INPUT = p14;
    const PinName& PIN_REGEN_INPUT = p15;
    const PinName& PIN_CURRENT_INPUT = p16;
@@ -70,6 +70,7 @@ Ccs::Ccs()
    PIN_CURRENT_INPUT,
    PIN_REGEN_INPUT,
    PIN_CAR_DIRECTION_INPUT,
+   MPPT_MODE_SWITCH,
    vehicleData_)
 , dashboard_(
    PIN_DISPLAY_MOSI,
