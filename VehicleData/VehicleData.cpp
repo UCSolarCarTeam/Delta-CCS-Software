@@ -1,18 +1,21 @@
 /*-------------------------------------------------------
    Made for the ccs mbed LPC-1768
    By Jordan Heinrichs on for the Solar Car Team
-   Copyright (c) 2014 by University of Calgary Solar Car Team 
+   Copyright (c) 2014 by University of Calgary Solar Car Team
 -------------------------------------------------------*/
 
 #include <VehicleData.h>
 
 VehicleData::VehicleData()
-: actualCurrentA(0.0f)
-, driverSetCurrentA(0.0f)
-, driverSetSpeedKph(0.0f)
-, busCurrentA(0.0f)
+: reportedMotorCurrent(0.0f)
+, driverSetCurrent(0.0f)
+, driverSetCurrentPercentage(0.0f)
+, driverSetSpeedRpm(0.0f)
+, deadmanPressed(false)
+, carDirection(VehicleData::Forward)
+, busCurrent(0.0f)
 , busVoltage(0.0f)
-, vehicleVelocityKph(0.0f)
+, vehicleVelocity(0.0f)
 , motorVelocityRpm(0.0f)
 , phaseCCurrent(0.0f)
 , phaseBCurrent(0.0f)
@@ -31,10 +34,30 @@ VehicleData::VehicleData()
 , activeMotor(0)
 , errorFlags(0)
 , limitFlags(0)
+, packStateOfCharge(0.0f)
+, packStateOfChargePercentage(0.0f)
+, balancePackStateOfCharge(0)
+, balancePackStateOfChargePercentage(0)
+, prechargeDriverStatusFlags(0)
+, prechargeState(0)
+, contactorSupplyVoltage(0)
+, prechargeTimerElapsedFlag(0)
+, prechargeTimerCounter(0)
+, batteryVoltage(0)
+, batteryCurrent(0)
+, batteryVoltageThresholdRising(0)
+, batteryVoltageThresholdFalling(0)
 , bmuStatusFlagsExtended(0)
-, headlightOn(false)
-, bluetoothConnected(false)
-, faultDetected(false)
+, fanSpeed0(0)
+, fanSpeed1(0)
+, fanCurrentConsumption(0)
+, cmuCurrentConsumption(0)
+, dynamicModeActivated(false)
+, secondaryBatteryUnderVoltage(false)
+, leftBlinkerActivated(false)
+, rightBlinkerActivated(false)
+, brakelightOn(false)
+, hazardsActivated(false)
 , pc(USBTX, USBRX)
 {
 }

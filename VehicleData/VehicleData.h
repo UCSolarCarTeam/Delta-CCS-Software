@@ -1,42 +1,38 @@
+#pragma once
 /*-------------------------------------------------------
    Made for the ccs mbed LPC-1768
    By Jordan Heinrichs on for the Solar Car Team
-   Copyright (c) 2014 by University of Calgary Solar Car Team 
+   Copyright (c) 2014 by University of Calgary Solar Car Team
 -------------------------------------------------------*/
-
-#pragma once
 
 #include <mbed.h>
 #include <CmuData.h>
+#include <MpptData.h>
 
-namespace VehicleDataEnums
+namespace VehicleDataDefines
 {
-    enum CarDirection {FORWARD = 0, REVERSE = 1};
+   const int NUMBER_OF_MPPTS = 7;
 }
 
-// Container for all parameters within the CCS, 
-// This was a conscience decision to not to have good encapsulation here
-// for overall ease of writing.
+// Container for all parameters within the CCS,
 struct VehicleData
 {
    VehicleData();
 
-   float actualCurrentA;
-   float driverSetCurrentA;
+   enum CarDirection {Forward = 0, Reverse = 1};
 
    //Driver inputs
-   float actualSpeedRpm;
-   float actualCurrent;
+   float reportedMotorCurrent;
    float driverSetCurrent;
+   float driverSetCurrentPercentage;
    float driverSetSpeedRpm;
-   float driverSetSpeedKph;
    bool deadmanPressed;
-   VehicleDataEnums::CarDirection carDirection; 
+   VehicleData::CarDirection carDirection;
 
    //Motor Controller
-   float busCurrentA;
+   float busCurrent;
    float busVoltage;
-   float vehicleVelocityKph;
+   float vehicleVelocity;
    float motorVelocityRpm;
    float phaseCCurrent;
    float phaseBCurrent;
@@ -55,20 +51,20 @@ struct VehicleData
    short int activeMotor;
    short int errorFlags;
    short int limitFlags;
-   
+
    //BMU Data
    CmuData cmuData[4];
    float packStateOfCharge;
    float packStateOfChargePercentage;
    float balancePackStateOfCharge;
    float balancePackStateOfChargePercentage;
-   unsigned char prechargeDriverStatusFlags; //Note: change this out for a enum
+   unsigned char prechargeDriverStatusFlags;
    unsigned char prechargeState;
    unsigned int contactorSupplyVoltage;
-   unsigned prechargeTimerElapsedFlag;
-   unsigned prechargeTimerCounter;
-   unsigned long batteryVoltage; //V
-   long batteryCurrent; //mA
+   unsigned int prechargeTimerElapsedFlag;
+   unsigned int prechargeTimerCounter;
+   float batteryVoltage;
+   float batteryCurrent;
    unsigned int batteryVoltageThresholdRising;
    unsigned int batteryVoltageThresholdFalling;
    unsigned long bmuStatusFlagsExtended;
@@ -76,17 +72,19 @@ struct VehicleData
    unsigned int fanSpeed1;
    unsigned int fanCurrentConsumption;
    unsigned int cmuCurrentConsumption;
-   
+
+   // MPPT
+   MpptData mpptData[VehicleDataDefines::NUMBER_OF_MPPTS];
+   bool dynamicModeActivated;
+
+   // Accessory power unit
+   bool secondaryBatteryUnderVoltage;
+
    //Light fields
    bool leftBlinkerActivated;
    bool rightBlinkerActivated;
-   bool headlightOn;
    bool brakelightOn;
    bool hazardsActivated;
 
-   //OLED display fields
-   bool bluetoothConnected;
-   bool faultDetected;
-   
    Serial pc;
 };

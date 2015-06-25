@@ -1,7 +1,7 @@
 /*-------------------------------------------------------
    Made for the ccs mbed LPC-1768
    By Jordan Heinrichs on 2014-05-10 for the Solar Car Team
-   Copyright (c) 2014 by University of Calgary Solar Car Team 
+   Copyright (c) 2014 by University of Calgary Solar Car Team
 -------------------------------------------------------*/
 
 #include <mbed.h>
@@ -18,13 +18,11 @@ namespace
    unsigned int LIGHT_OFF = 0;
 }
 
-Lights::Lights(PinName headLightsPin, 
-               PinName brakeLightsPin, 
-               PinName leftBlinkerPin, 
-               PinName rightBlinkerPin, 
+Lights::Lights(PinName brakeLightsPin,
+               PinName leftBlinkerPin,
+               PinName rightBlinkerPin,
                VehicleData& vehicleData)
-: headLightsPin_(headLightsPin)
-, brakeLightsPin_(brakeLightsPin)
+: brakeLightsPin_(brakeLightsPin)
 , leftBlinkerPin_(leftBlinkerPin)
 , rightBlinkerPin_(rightBlinkerPin)
 , leftBlinkerStatus_(LIGHT_OFF)
@@ -39,7 +37,6 @@ void Lights::initalizeLights()
    timer_.start();
    vehicleData_.leftBlinkerActivated = false;
    vehicleData_.rightBlinkerActivated = false;
-   vehicleData_.headlightOn = false;
    vehicleData_.brakelightOn = false;
    vehicleData_.hazardsActivated = false;
 
@@ -50,13 +47,12 @@ void Lights::updateLights()
 {
    updateBlinkersAndHazard();
 
-   setLight(headLightsPin_, vehicleData_.headlightOn);
    setLight(brakeLightsPin_, vehicleData_.brakelightOn);
 }
 
 void Lights::updateBlinkersAndHazard()
 {
-   if(timer_.read_ms() >= BLINK_TIME)
+   if(static_cast<unsigned int>(timer_.read_ms()) >= BLINK_TIME)
    {
       if(vehicleData_.hazardsActivated)
       {

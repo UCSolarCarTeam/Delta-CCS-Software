@@ -1,37 +1,38 @@
+#pragma once
 /*-------------------------------------------------------
    Made for the ccs mbed LPC-1768
    By Jordan Heinrichs on for the Solar Car Team
-   Copyright (c) 2014 by University of Calgary Solar Car Team 
+   Copyright (c) 2014 by University of Calgary Solar Car Team
 -------------------------------------------------------*/
 
-#pragma once
-
-// Mbed includes
 #include <mbed.h>
 
-//Solar car includes
 class VehicleData;
 union TritiumDataFormatter;
 
-class CanInterface
+class MotorControllerCan
 {
 public:
-   CanInterface(PinName canTd,
-                PinName canRd,
-                PinName canMpptTd,
-                PinName canMpptRd,
-                VehicleData& vehicleData);
+   MotorControllerCan(
+      const PinName& canTd,
+      const PinName& canRd,
+      const PinName& resetPin,
+      VehicleData& vehicleData);
 
    void initInterface();
    void sendCanData();
 
 private:
    void readCan();
-   
+
    void sendSetbusCurrentALimitTo100Percent();
    void sendSetVelocityAndCurrent();
+
+   void requestResetOfMotorControllers();
    void sendResetMotorControllerOne();
    void sendResetMotorControllerTwo();
+   void resetMotorControllers();
+
    void sendConfigurationMessage();
 
    void readStatus(const unsigned char* messageData);
@@ -58,9 +59,11 @@ private:
    void writeFloatArrayToCharArray(const float* input, char* output);
    void writeCharArrayToFloat(const unsigned char* input, float* output);
    void populateTritiumDataFormatter(const unsigned char* input, TritiumDataFormatter& output);
+
 private:
    CAN motorControllerCan_;
-   CAN mpptCan_;
-   
+   InterruptIn resetInput_;
+   volatile bool resetMotorControllers_;
+
    VehicleData& vehicleData_;
 };

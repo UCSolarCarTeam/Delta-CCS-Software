@@ -11,4 +11,6 @@
 # Sublime ignores #
 #######################
 .tags*
+.cproject
+.project
 

@@ -1,43 +1,43 @@
+#pragma once
 /*-------------------------------------------------------
-  Made for the dashboard OLED displays
-  By Jordan Heinrichs on 2014-05-10 for the Solar Car Team
-  Copyright (c) 2014 by University of Calgary Solar Car Team 
+   Made for the dashboard OLED displays
+   By Jordan Heinrichs on 2014-05-10 for the Solar Car Team
+   Copyright (c) 2014 by University of Calgary Solar Car Team
 -------------------------------------------------------*/
 
-#ifndef DASHBOARD_H
-#define DASHBOARD_H
-
-//Mbed includes
 #include <mbed.h>
 
-//Solar Car includes
-#include <GraphicImageData.h>
 #include <CharDisplay.h>
-#include <GraphicDisplay.h>
-
 class VehicleData;
 
 class Dashboard
 {
 public:
-  Dashboard(PinName mosi, PinName miso, PinName clock, PinName chipSelectCharDisplay,
-            PinName chipSelectGraphicDisplay, PinName graphicDisplayDataSignal,
-            PinName graphicDisplayReset,
-            VehicleData& vehicleData);
-  
-  void initAll();
-  void displayTest();
-  void displayDashboard(); 
+   Dashboard(
+      const PinName& mosi,
+      const PinName& miso,
+      const PinName& clock,
+      const PinName& chipSelectChar1Display,
+      const PinName& chipSelectChar2Display,
+      const PinName& chipSelectChar3Display,
+      const VehicleData& vehicleData);
+
+   void initAll();
+   void updateDashboard();
 
 private:
-  SPI serialCommunication_;
-  GraphicDisplay graphic_;
-  CharDisplay charDisplay_;
-  GraphicImageData graphicImageData_;
+   void updateDisplay1();
+   void updateDisplay2();
+   void updateDisplay3();
+   void displayTest(CharDisplay& display);
 
-  VehicleData& vehicleData_;
+private:
+   SPI serialCommunication_;
+   CharDisplay charDisplay1_;
+   CharDisplay charDisplay2_;
+   CharDisplay charDisplay3_;
 
-  const unsigned char* findDigitNumber(int number);
+   int timer_;
+
+   const VehicleData& vehicleData_;
 };
-
-#endif 

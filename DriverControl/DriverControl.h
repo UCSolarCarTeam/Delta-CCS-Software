@@ -1,29 +1,26 @@
 /*-------------------------------------------------------
    Made for the ccs mbed LPC-1768
    By Jordan Heinrichs on for the Solar Car Team
-   Copyright (c) 2014 by University of Calgary Solar Car Team 
+   Copyright (c) 2014 by University of Calgary Solar Car Team
 -------------------------------------------------------*/
 
 #pragma once
 
-//Mbed includes
 #include <mbed.h>
-
-//Solar car includes
-class VehicleData;
+#include <VehicleData.h>
 
 class DriverControl
 {
 public:
-   DriverControl(PinName deadmanInput,
-                 PinName hazardsInput,
-                 PinName rightBlinkerInput,
-                 PinName leftBlinkerInput,
-                 PinName brakeInput,
-                 PinName headlightInput,
-                 PinName currentInput,
-                 PinName velocityInput,
-                 PinName directionInput,
+   DriverControl(const PinName& deadmanInput,
+                 const PinName& hazardsInput,
+                 const PinName& rightBlinkerInput,
+                 const PinName& leftBlinkerInput,
+                 const PinName& brakeInput,
+                 const PinName& currentInput,
+                 const PinName& regenInput,
+                 const PinName& directionInput,
+                 const PinName& mpptModeInput,
                  VehicleData& vehicleData);
 
    void initializeDriverControls();
@@ -32,12 +29,18 @@ public:
 private:
    void setSpeedAndCurrent();
    float checkIfAboveZeroThreshold(const float input);
-   
+
    float calculateRunningAverage(const float* averageData);
    void addLatestToRunningAverage(float* averageData, int& currentIndex, float newData);
 
-   void setForwardSpeedAndCurrent();
-   void setReverseSpeedAndCurrent();
+   void setMovementSpeedAndCurrent(VehicleData::CarDirection direction);
+   void setRegenSpeedAndCurrent();
+
+   void zeroDriverInputs();
+   void readInputs();
+
+   bool isNewVehicleDirectionInputSafe(VehicleData::CarDirection direction);
+   bool isRegenBraking();
 
 private:
    DigitalIn deadmanInput_;
@@ -45,18 +48,16 @@ private:
    DigitalIn rightBlinkerInput_;
    DigitalIn leftBlinkerInput_;
    DigitalIn brakeInput_;
-   DigitalIn headlightInput_;
    DigitalIn directionInput_;
+   DigitalIn mpptModeInput_;
 
    AnalogIn currentInput_;
-   AnalogIn velocityInput_;
+   AnalogIn regenInput_;
 
    VehicleData& vehicleData_;
-   
-   float runningAverageRpmData_[5];
-   int currentIndexRpmDataAverage_;
+
+   float runningAverageRegenBrakingData_[5];
+   int currentIndexRegenBrakingDataAverage_;
    float runningAverageCurrentData_[5];
    int currentIndexCurrentDataAverage_;
-   int runningAverageCarDirectionData_[5];
-   int currentIndexCarDirectionAverage_;
 };

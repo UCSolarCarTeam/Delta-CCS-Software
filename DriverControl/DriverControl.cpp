@@ -1,59 +1,48 @@
 /*-------------------------------------------------------
    Made for the ccs mbed LPC-1768
    By Jordan Heinrichs on for the Solar Car Team
-   Copyright (c) 2014 by University of Calgary Solar Car Team 
+   Copyright (c) 2014 by University of Calgary Solar Car Team
 -------------------------------------------------------*/
 
-// Solar car includes
+#include <CcsDefines.h>
 #include <DriverControl.h>
-#include <VehicleData.h>
+
+using namespace CcsDefines;
 
 namespace
 {
-   // Control parameters
-   // Wavesculptor 22 requires velocity in RPM
-   const unsigned int MAX_FORWARD_RPM = 1000; //Was 1298 on old system
-   const unsigned int MAX_REVERSE_RPM = 200;
-   const unsigned int MAX_CURRENT_AMPS = 80;
-   //RPM to Kph is wheel diameter * pi * 60 s / 1000 m
-   const float RPM_TO_KPH_CONVERSION = 0.545 * 3.14159265358979323 * 60.0 / 1000.0;
-   const float MAX_CURRENT = 1.0f;
-
    const float NON_ZERO_THRESHOLD = 0.05f;
-   const float MAX_SPEED_TO_CHANGE_DIRECTIONS = 3.0f;
+   const float MAX_SPEED_TO_CHANGE_DIRECTIONS = 1.0f; // 1 m/s or 3.6 km/h
 }
 
-DriverControl::DriverControl(PinName deadmanInput,
-                             PinName hazardsInput,
-                             PinName rightBlinkerInput,
-                             PinName leftBlinkerInput,
-                             PinName brakeInput,
-                             PinName headlightInput,
-                             PinName currentInput,
-                             PinName velocityInput,
-                             PinName directionInput,
+DriverControl::DriverControl(const PinName& deadmanInput,
+                             const PinName& hazardsInput,
+                             const PinName& rightBlinkerInput,
+                             const PinName& leftBlinkerInput,
+                             const PinName& brakeInput,
+                             const PinName& currentInput,
+                             const PinName& regenInput,
+                             const PinName& directionInput,
+                             const PinName& mpptModeInput,
                              VehicleData& vehicleData)
 : deadmanInput_(deadmanInput)
 , hazardsInput_(hazardsInput)
 , rightBlinkerInput_(rightBlinkerInput)
 , leftBlinkerInput_(leftBlinkerInput)
 , brakeInput_(brakeInput)
-, headlightInput_(headlightInput)
 , directionInput_(directionInput)
 , currentInput_(currentInput)
-, velocityInput_(velocityInput)
+, regenInput_(regenInput)
 , vehicleData_(vehicleData)
-, currentIndexRpmDataAverage_(0)
+, mpptModeInput_(mpptModeInput)
+, currentIndexRegenBrakingDataAverage_(0)
 , currentIndexCurrentDataAverage_(0)
-, currentIndexCarDirectionAverage_(0)
 {
    for(int i = 0; i < 5; i++)
    {
-      runningAverageRpmData_[i] = 0.0f;
+      runningAverageRegenBrakingData_[i] = 0.0f;
       runningAverageCurrentData_[i] = 0.0f;
-      runningAverageCarDirectionData_[i] = 0;
    }
-    vehicleData_.pc.printf("Init Driver control\n");
 }
 
 void DriverControl::initializeDriverControls()
@@ -63,54 +52,32 @@ void DriverControl::initializeDriverControls()
 
 void DriverControl::readDriverControls()
 {
-   vehicleData_.deadmanPressed = deadmanInput_;
-   vehicleData_.hazardsActivated = hazardsInput_;
-   vehicleData_.rightBlinkerActivated = rightBlinkerInput_;
-   vehicleData_.leftBlinkerActivated = leftBlinkerInput_;
-   vehicleData_.headlightOn = headlightInput_;
-   vehicleData_.brakelightOn = brakeInput_;
-   vehicleData_.hazardsActivated = hazardsInput_;
-
-   const int directionInput = directionInput_;
-
-   if(vehicleData_.carDirection != directionInput &&
-      vehicleData_.vehicleVelocityKph > MAX_SPEED_TO_CHANGE_DIRECTIONS)
-   {
-      //Safety measure. Not allow changing direction at speed. Stop car.
-      vehicleData_.driverSetCurrent = 0.0f;
-      vehicleData_.driverSetSpeedRpm = 0.0f;
-      vehicleData_.driverSetCurrentA = 0.0f;
-      vehicleData_.driverSetSpeedKph = 0.0f;
-   }
-   else
-   {
-      vehicleData_.carDirection = static_cast<VehicleDataEnums::CarDirection>(directionInput);
-
-      setSpeedAndCurrent();
-   }
+   readInputs();
+   setSpeedAndCurrent();
 }
 
 void DriverControl::setSpeedAndCurrent()
 {
- // removed until deadmans are physically implemented
- //  if(vehicleData_.deadmanPressed)
-//   {
-      if(vehicleData_.carDirection == VehicleDataEnums::FORWARD)
+   // This is read only once per loop because it could change due to noise if read again
+   // after the safety check.
+   const VehicleData::CarDirection directionInput =
+      static_cast<VehicleData::CarDirection>(directionInput_.read());
+   if (vehicleData_.deadmanPressed &&
+      isNewVehicleDirectionInputSafe(directionInput))
+   {
+      if (isRegenBraking())
       {
-         setForwardSpeedAndCurrent();
+         setRegenSpeedAndCurrent();
       }
       else
       {
-         setReverseSpeedAndCurrent();
+         setMovementSpeedAndCurrent(directionInput);
       }
-//   }
-//   else
-//   {
-//      vehicleData_.driverSetCurrent = 0.0f;
-//      vehicleData_.driverSetSpeedRpm = 0.0f;
-//      vehicleData_.driverSetSpeedKph = 0;
-//      vehicleData_.driverSetCurrentA = 0.0f;
-//   }
+   }
+   else
+   {
+      zeroDriverInputs();
+   }
 }
 
 float DriverControl::checkIfAboveZeroThreshold(const float input)
@@ -130,36 +97,76 @@ float DriverControl::calculateRunningAverage(const float* averageData)
    float total = 0.0;
    for(int i = 0; i < 5; i++)
    {
-       total += averageData[i]; 
+       total += averageData[i];
    }
-   
-   return total / 5.0;
+
+   return total / 5.0f;
 }
 
-void DriverControl::addLatestToRunningAverage(float* averageData, int& currentIndex, float newData)
+void DriverControl::addLatestToRunningAverage(
+   float* averageData, int& currentIndex, float newData)
 {
    averageData[currentIndex] = newData;
    currentIndex++;
    if(currentIndex >= 5)
    {
       currentIndex = 0;
-   }   
+   }
 }
 
-void DriverControl::setForwardSpeedAndCurrent()
+void DriverControl::setMovementSpeedAndCurrent(VehicleData::CarDirection direction)
 {
-   addLatestToRunningAverage(runningAverageRpmData_, currentIndexRpmDataAverage_, checkIfAboveZeroThreshold(velocityInput_) * MAX_FORWARD_RPM);
-   addLatestToRunningAverage(runningAverageCurrentData_, currentIndexCurrentDataAverage_, checkIfAboveZeroThreshold(currentInput_) * MAX_CURRENT);
-   vehicleData_.driverSetSpeedRpm = calculateRunningAverage(runningAverageRpmData_);
-   vehicleData_.driverSetCurrent = calculateRunningAverage(runningAverageCurrentData_);
-   vehicleData_.driverSetSpeedKph = vehicleData_.driverSetSpeedRpm * RPM_TO_KPH_CONVERSION;
-   vehicleData_.driverSetCurrentA = vehicleData_.driverSetCurrent * MAX_CURRENT_AMPS;
+   vehicleData_.carDirection = direction;
+   if(vehicleData_.carDirection == VehicleData::Forward)
+   {
+      vehicleData_.driverSetSpeedRpm = MAX_FORWARD_RPM;
+   }
+   else
+   {
+      vehicleData_.driverSetSpeedRpm = -MAX_REVERSE_RPM;
+   }
+   vehicleData_.driverSetCurrentPercentage = calculateRunningAverage(runningAverageCurrentData_);
+   vehicleData_.driverSetCurrent = vehicleData_.driverSetCurrentPercentage * MAX_CURRENT_AMPS;
 }
 
-void DriverControl::setReverseSpeedAndCurrent()
+void DriverControl::setRegenSpeedAndCurrent()
 {
-   vehicleData_.driverSetSpeedRpm = -checkIfAboveZeroThreshold(velocityInput_) * MAX_REVERSE_RPM;
-   vehicleData_.driverSetCurrent = checkIfAboveZeroThreshold(currentInput_) * MAX_CURRENT;
-   vehicleData_.driverSetSpeedKph = -vehicleData_.driverSetSpeedRpm * RPM_TO_KPH_CONVERSION;
-   vehicleData_.driverSetCurrentA = vehicleData_.driverSetCurrent * MAX_CURRENT_AMPS;
+   vehicleData_.driverSetSpeedRpm = 0.0f;
+   vehicleData_.driverSetCurrentPercentage =
+      calculateRunningAverage(runningAverageCurrentData_) * MAX_CURRENT_PERCENT_REGEN;
+   vehicleData_.driverSetCurrent =
+      vehicleData_.driverSetCurrentPercentage * MAX_CURRENT_AMPS;
+}
+
+void DriverControl::zeroDriverInputs()
+{
+   vehicleData_.driverSetCurrentPercentage = 0.0f;
+   vehicleData_.driverSetSpeedRpm = 0.0f;
+   vehicleData_.driverSetCurrent = 0.0f;
+}
+
+void DriverControl::readInputs()
+{
+   vehicleData_.deadmanPressed = deadmanInput_;
+   vehicleData_.hazardsActivated = hazardsInput_;
+   vehicleData_.rightBlinkerActivated = rightBlinkerInput_;
+   vehicleData_.leftBlinkerActivated = leftBlinkerInput_;
+   vehicleData_.brakelightOn = brakeInput_;
+   vehicleData_.dynamicModeActivated = mpptModeInput_;
+
+   addLatestToRunningAverage(runningAverageRegenBrakingData_, currentIndexRegenBrakingDataAverage_,
+      checkIfAboveZeroThreshold(regenInput_));
+   addLatestToRunningAverage(runningAverageCurrentData_, currentIndexCurrentDataAverage_,
+      checkIfAboveZeroThreshold(currentInput_));
+}
+
+bool DriverControl::isNewVehicleDirectionInputSafe(VehicleData::CarDirection direction)
+{
+   return vehicleData_.carDirection == direction ||
+      vehicleData_.vehicleVelocity <= MAX_SPEED_TO_CHANGE_DIRECTIONS;
+}
+
+bool DriverControl::isRegenBraking()
+{
+   return regenInput_ > NON_ZERO_THRESHOLD;
 }

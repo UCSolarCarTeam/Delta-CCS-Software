@@ -1,176 +1,162 @@
+/*-------------------------------------------------------
+   Made for the dashboard OLED displays
+   By Jordan Heinrichs on 2014-05-10 for the Solar Car Team
+   Copyright (c) 2015 by University of Calgary Solar Car Team
+-------------------------------------------------------*/
+
+#include <CcsDefines.h>
 #include <CharDisplay.h>
-#include <GraphicDisplay.h>
-#include <GraphicImageData.h>
+#include <Dashboard.h>
 #include <VehicleData.h>
 
-#include <stdio.h>
-
-#include <Dashboard.h>
-
-Dashboard::Dashboard(PinName mosi, PinName miso, PinName clock, PinName chipSelectCharDisplay,
-            PinName chipSelectGraphicDisplay, PinName graphicDisplayDataSignal,
-            PinName graphicDisplayReset,
-            VehicleData& vehicleData) 
-            : serialCommunication_(mosi, miso, clock)
-            , graphic_(&serialCommunication_, chipSelectGraphicDisplay,
-                       graphicDisplayDataSignal, graphicDisplayReset)
-            , charDisplay_(&serialCommunication_, chipSelectCharDisplay)
-            , vehicleData_(vehicleData)
-            {
-               vehicleData_.pc.printf("init dashboard\n");
-            }
-            
-void Dashboard::initAll()
+Dashboard::Dashboard(
+      const PinName& mosi,
+      const PinName& miso,
+      const PinName& clock,
+      const PinName& chipSelectChar1Display,
+      const PinName& chipSelectChar2Display,
+      const PinName& chipSelectChar3Display,
+      const VehicleData& vehicleData)
+: serialCommunication_(mosi, miso, clock)
+, charDisplay1_(&serialCommunication_, chipSelectChar1Display)
+, charDisplay2_(&serialCommunication_, chipSelectChar2Display)
+, charDisplay3_(&serialCommunication_, chipSelectChar3Display)
+, timer_(0)
+, vehicleData_(vehicleData)
 {
-  wait_ms(1); //wait for power to stabalize on the displays
-  charDisplay_.init();
-  graphic_.init();
-  wait_ms(1); //Wait to make sure it is all completed.
-  graphic_.fillRamWithInput(0x00);
-  wait_ms(1);
 }
 
-void Dashboard::displayDashboard()
+void Dashboard::initAll()
+{
+   wait_ms(1); //wait for power to stabalize on the displays
+   charDisplay1_.init();
+   charDisplay2_.init();
+   charDisplay3_.init();
+   wait_ms(1); //Wait to make sure it is all completed.
+}
+
+void Dashboard::updateDashboard()
+{
+   switch(timer_)
+   {
+   case 0:
+      updateDisplay1();
+      break;
+   case 1:
+      updateDisplay2();
+      break;
+   case 2:
+      updateDisplay3();
+      break;
+   }
+
+   if (timer_ == 2)
+   {
+      timer_ = 0;
+   }
+   else
+   {
+      timer_++;
+   }
+}
+
+void Dashboard::updateDisplay1()
 {
    char message1[21];
-   char message2[21];  
+   char message2[21];
    char message3[21];
    char message4[21];
 
-   sprintf(message1, "ATCL %4.1f V %4.1f A ", vehicleData_.busVoltage, vehicleData_.busCurrentA);
-   sprintf(message2, "ATCL Speed: %3.0f km/h", vehicleData_.vehicleVelocityKph);
-   sprintf(message3, "Set  Amp:   %4.1f  A", vehicleData_.driverSetCurrentA);
-   sprintf(message4, "Set Speed:  %3.1f km/h", vehicleData_.driverSetSpeedKph);
+   const float driverSetSpeedKph = vehicleData_.driverSetSpeedRpm * CcsDefines::RPM_TO_KPH_CONVERSION;
+   sprintf(message1, "Set Speed:  %3.1f km/h", driverSetSpeedKph);
+   const float vehicleVelocityKph = vehicleData_.vehicleVelocity * CcsDefines::MPS_KPH_CONVERSION;
+   sprintf(message2, "ATCL Speed: %3.0f km/h", vehicleVelocityKph);
+   sprintf(message3, "Set Current %4.1f A", vehicleData_.driverSetCurrent);
+   sprintf(message4, "Odometer %4.1f km", vehicleData_.odometer / 1000.0f);
 
-   charDisplay_.setLine(1);
-   charDisplay_.writeMessage(message1,20);
+   charDisplay1_.setLine(1);
+   charDisplay1_.writeMessage(message1,20);
 
-   charDisplay_.setLine(2);
-   charDisplay_.writeMessage(message2, 20);
+   charDisplay1_.setLine(2);
+   charDisplay1_.writeMessage(message2, 20);
 
-   charDisplay_.setLine(3);
-   charDisplay_.writeMessage(message3, 20);
+   charDisplay1_.setLine(3);
+   charDisplay1_.writeMessage(message3, 20);
 
-   charDisplay_.setLine(4);
-   charDisplay_.writeMessage(message4, 20);
- /*
-   int vehicleVelocityKph = vehicleData_.vehicleVelocityKph;
-
-   graphic_.displayData(findDigitNumber(vehicleVelocityKph / 100),
-                        graphicImageData_.imageBoundsDigitLeftColumn,
-                        graphicImageData_.imageBoundsDigitRow,
-                        graphicImageData_.numberOfBytesInDigits);
-   vehicleVelocityKph %= 100;
-   graphic_.displayData(findDigitNumber(vehicleVelocityKph / 10),
-                        graphicImageData_.imageBoundsDigitCenterColumn,                      
-                        graphicImageData_.imageBoundsDigitRow,
-                        graphicImageData_.numberOfBytesInDigits);
-   vehicleVelocityKph %= 10;
-   graphic_.displayData(findDigitNumber(vehicleVelocityKph),
-                        graphicImageData_.imageBoundsDigitRightColumn,
-                        graphicImageData_.imageBoundsDigitRow,
-                        graphicImageData_.numberOfBytesInDigits);
-
-   graphic_.displayData(graphicImageData_.units,
-                        graphicImageData_.imageBoundsLeftSymbolColumn,
-                        graphicImageData_.imageBoundsBottomSymbolRow,
-                        graphicImageData_.numberOfBytesInSymbol);
-
-   if (vehicleData_.bluetoothConnected)
-   {
-      graphic_.displayData(graphicImageData_.bluetooth,
-         graphicImageData_.imageBoundsRightSymbolColumn,
-         graphicImageData_.imageBoundsTopSymbolRow,
-         graphicImageData_.numberOfBytesInSymbol);
-   }
-   else
-   {
-      graphic_.fillRamSectionWithInput(0x00,
-         graphicImageData_.imageBoundsRightSymbolColumn,
-         graphicImageData_.imageBoundsTopSymbolRow,
-         graphicImageData_.numberOfBytesInSymbol);
-   }
-
-   if (vehicleData_.faultDetected)
-   {
-      graphic_.displayData(graphicImageData_.caution,
-         graphicImageData_.imageBoundsRightSymbolColumn,
-         graphicImageData_.imageBoundsBottomSymbolRow,
-         graphicImageData_.numberOfBytesInSymbol);
-   }
-   else
-   {
-      graphic_.fillRamSectionWithInput(0x00,
-         graphicImageData_.imageBoundsRightSymbolColumn,
-         graphicImageData_.imageBoundsBottomSymbolRow,
-         graphicImageData_.numberOfBytesInSymbol);
-   }
-
-   if (vehicleData_.headlightOn)
-   {
-      graphic_.displayData(graphicImageData_.headlights,
-         graphicImageData_.imageBoundsLeftSymbolColumn,
-         graphicImageData_.imageBoundsTopSymbolRow,
-         graphicImageData_.numberOfBytesInSymbol);
-   }
-   else
-   {
-      graphic_.fillRamSectionWithInput(0x00,
-         graphicImageData_.imageBoundsLeftSymbolColumn,
-         graphicImageData_.imageBoundsTopSymbolRow,
-         graphicImageData_.numberOfBytesInSymbol);
-   }*/
+   charDisplay1_.setLine(4);
+   charDisplay1_.writeMessage(message4, 20);
 }
 
-const unsigned char* Dashboard::findDigitNumber(int number )
+void Dashboard::updateDisplay2()
 {
-  switch (number)
-  {
-    case 0:
-      return graphicImageData_.digit0;
-    case 1:
-      return graphicImageData_.digit1;
-    case 2:
-      return graphicImageData_.digit2;
-    case 3:
-      return graphicImageData_.digit3;
-    case 4:
-      return graphicImageData_.digit4;
-    case 5:
-      return graphicImageData_.digit5;
-    case 6:
-      return graphicImageData_.digit6;
-    case 7:
-      return graphicImageData_.digit7;
-    case 8:
-      return graphicImageData_.digit8;
-    case 9:
-      return graphicImageData_.digit9;
-  default:
-      return graphicImageData_.digit0;
-  }
+   char message1[21];
+   char message2[21];
+   char message3[21];
+   char message4[21];
+
+   sprintf(message1, "Bus Current %4.1f A ", vehicleData_.busCurrent);
+   sprintf(message2, "Bus Voltage %4.1f V", vehicleData_.busVoltage);
+   const float power = vehicleData_.busVoltage * vehicleData_.busCurrent;
+   sprintf(message3, "Power   %4.1f  A", power);
+   sprintf(message4, "FTW mode enabled!");
+
+   charDisplay2_.setLine(1);
+   charDisplay2_.writeMessage(message1,20);
+
+   charDisplay2_.setLine(2);
+   charDisplay2_.writeMessage(message2, 20);
+
+   charDisplay2_.setLine(3);
+   charDisplay2_.writeMessage(message3, 20);
+
+   charDisplay2_.setLine(4);
+   charDisplay2_.writeMessage(message4, 20);
 }
 
-void Dashboard::displayTest()
+void Dashboard::updateDisplay3()
+{
+   char message1[21];
+   char message2[21];
+   char message3[21];
+   char message4[21];
+
+   const bool majorBmuError = vehicleData_.bmuStatusFlagsExtended & CcsDefines::MAJOR_BMU_ERROR_MASK;
+   sprintf(message1, "%s", majorBmuError?"BMU error detected!":"BMU okay");
+   const bool majorMcError = vehicleData_.errorFlags & CcsDefines::MAJOR_MC_ERROR_MASK;
+   sprintf(message2, "%s", majorMcError?"MC error detected!":"MC okay");
+   sprintf(message3, "MPPT status: N/A");
+   sprintf(message4, "High Voltage: %s",
+      (vehicleData_.prechargeState >= 4)?"Enabled":"Disabled");
+
+   charDisplay3_.setLine(1);
+   charDisplay3_.writeMessage(message1,20);
+
+   charDisplay3_.setLine(2);
+   charDisplay3_.writeMessage(message2, 20);
+
+   charDisplay3_.setLine(3);
+   charDisplay3_.writeMessage(message3, 20);
+
+   charDisplay3_.setLine(4);
+   charDisplay3_.writeMessage(message4, 20);
+}
+
+void Dashboard::displayTest(CharDisplay& display)
 {
     char message1[] = "ACTL Volt:  XXX.X  V";
     char message2[] = "ACTL Amp:   XXX.X  A";
     char message3[] = "Set  Amp:   XXX.X  A";
     char message4[] = "Set Speed:  XXX km/h";
-  
-    //graphic_.displayPicture(); This has been ommitted due to code size 
-                                //limitations.
-    graphic_.fillRamWithInput(0xFF);
-    
-    charDisplay_.setLine(1);
-    charDisplay_.writeMessage(message1,20);
 
-    charDisplay_.setLine(2);
-    charDisplay_.writeMessage(message2, 20);
-    
-    charDisplay_.setLine(3);
-    charDisplay_.writeMessage(message3, 20);
-    
-    charDisplay_.setLine(4);
-    charDisplay_.writeMessage(message4, 20);
+    display.setLine(1);
+    display.writeMessage(message1,20);
+
+    display.setLine(2);
+    display.writeMessage(message2, 20);
+
+    display.setLine(3);
+    display.writeMessage(message3, 20);
+
+    display.setLine(4);
+    display.writeMessage(message4, 20);
 }

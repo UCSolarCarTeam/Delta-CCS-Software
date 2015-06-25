@@ -1,147 +1,308 @@
 /*-------------------------------------------------------
    Made for the ccs mbed LPC-1768
    By Jordan Heinrichs on for the Solar Car Team
-   Copyright (c) 2014 by University of Calgary Solar Car Team 
+   Copyright (c) 2014 by University of Calgary Solar Car Team
 -------------------------------------------------------*/
 
-// Solar car includes
+#define BLUETOOTH 0
+
+#include <CcsDefines.h>
+#include <CrcCalculator.h>
 #include <TelemetryReporting.h>
 #include <VehicleData.h>
 
+union FloatDataUnion
+{
+   float floatData;
+   char charData[4];
+};
+
 namespace
 {
-   unsigned int BLUETOOTH_BAUD_RATE = 115200;
-   unsigned int BLUETOOTH_NUMBER_OF_BITS = 8;
-   unsigned int BLUETOOTH_STOP_BIT = 1;
-   SerialBase::Parity BLUETOOTH_PARITY = SerialBase::None;
+   unsigned int BAUD_RATE = 115200;
+   unsigned int NUMBER_OF_BITS = 8;
+   unsigned int STOP_BIT = 1;
+   SerialBase::Parity PARITY = SerialBase::None;
 
-   const char GET_BLUETOOTH_STATUS[] = "AT\n";
+   // These lengths only include the data. Not the checksum
+   const unsigned int KEY_DRIVER_CONTROL_LENGTH = 21;
+   const unsigned int DRIVER_CONTROL_DETAILS_LENGTH = 29;
+   const unsigned int FAULT_LENGTH = 7;
+   const unsigned int BATTERY_DATA_LENGTH = 18;
+   const unsigned int CMU_DATA_LENGTH = 42;
+   const unsigned int MPPT_DATA_LENGTH = 21;
+   const unsigned int CHECKSUM_LENGTH = 2;
+
+   const unsigned int FRAMING_LENGTH_INCREASE = 5;
+   const unsigned char TERMINATING_BYTE = 0x00;
+
+   // Packet IDs
+   const unsigned char KEY_DRIVER_CONTROL_ID = 0x01;
+   const unsigned char DRIVER_CONTROL_DETAILS_ID = 0x02;
+   const unsigned char FAULT_ID = 0x03;
+   const unsigned char BATTERY_DATA_ID = 0x04;
+   const unsigned char CMU_DATA_ID = 0x05;
+   const unsigned char MPPT_DATA_ID = 0x06;
 }
 
 TelemetryReporting::TelemetryReporting(PinName uartTx,
                                        PinName uartRx,
                                        VehicleData& vehicleData)
-: bluetooth_(uartTx, uartRx)
+: uart_(uartTx, uartRx)
 , vehicleData_(vehicleData)
+, timer_(0)
 {
 }
 
 void TelemetryReporting::initTelemetryReporting()
 {
-   bluetooth_.baud(BLUETOOTH_BAUD_RATE);
-   bluetooth_.format(BLUETOOTH_NUMBER_OF_BITS, BLUETOOTH_PARITY, BLUETOOTH_STOP_BIT);
+   uart_.baud(BAUD_RATE);
+   uart_.format(NUMBER_OF_BITS, PARITY, STOP_BIT);
 
-  // For future use to receive data from chase car.
-  // bluetooth_.attach(this, &TelemetryReporting::readBluetooth);
-
-   bluetooth_.puts(GET_BLUETOOTH_STATUS);
-
-   bluetooth_.puts("SET BT AUTH * 0001\n");
-
-   bluetooth_.puts("SET BT PAGEMODE 3 3000 1\n");
+#if BLUETOOTH
+   uart_.puts("AT\n");
+   uart_.puts("SET BT AUTH * 0001\n");
+   uart_.puts("SET BT PAGEMODE 3 3000 1\n");
+#endif
 }
 
 void TelemetryReporting::transmitTelemetry()
 {
-   transmitVehicleStatus();
-}
+   sendKeyDriverControlTelemetry();
+   sendFaults();
 
-void TelemetryReporting::transmitVehicleStatus()
-{
-   sendFloatWithIdentifier("00", vehicleData_.driverSetSpeedRpm);
-   sendFloatWithIdentifier("01", vehicleData_.driverSetCurrent);   
-   
-   sendFloatWithIdentifier("02", vehicleData_.vehicleVelocityKph);
-   sendFloatWithIdentifier("03", vehicleData_.busCurrentA);
-   sendFloatWithIdentifier("04", vehicleData_.busVoltage);
-   sendFloatWithIdentifier("05", vehicleData_.motorVelocityRpm);
-   sendFloatWithIdentifier("06", vehicleData_.motorVoltageReal);
-   sendFloatWithIdentifier("07", vehicleData_.motorCurrentReal);
-   sendFloatWithIdentifier("08", vehicleData_.backEmfImaginary);
-   sendFloatWithIdentifier("09", vehicleData_.ipmHeatSinkTemp);
-   sendFloatWithIdentifier("11", vehicleData_.dspBoardTemp);
-   sendFloatWithIdentifier("12", vehicleData_.dcBusAmpHours);
-   sendVariableWithIdentifier("14", vehicleData_.receivedErrorCount);
-   sendVariableWithIdentifier("15", vehicleData_.transmittedErrorCount);
-
-   sendVariableWithIdentifier("16", vehicleData_.cmuData[0].pcbTemperature);
-   sendVariableWithIdentifier("17", vehicleData_.cmuData[0].cellTemperature);
-   sendVariableWithIdentifier("18", vehicleData_.cmuData[0].cellVoltage[0]);
-   sendVariableWithIdentifier("19", vehicleData_.cmuData[0].cellVoltage[1]);
-   sendVariableWithIdentifier("20", vehicleData_.cmuData[0].cellVoltage[2]);
-   sendVariableWithIdentifier("21", vehicleData_.cmuData[0].cellVoltage[3]);
-   sendVariableWithIdentifier("22", vehicleData_.cmuData[0].cellVoltage[4]);
-   sendVariableWithIdentifier("23", vehicleData_.cmuData[0].cellVoltage[5]);
-   sendVariableWithIdentifier("24", vehicleData_.cmuData[0].cellVoltage[6]);
-   sendVariableWithIdentifier("25", vehicleData_.cmuData[0].cellVoltage[7]);
-   sendVariableWithIdentifier("26", vehicleData_.cmuData[1].pcbTemperature);
-   sendVariableWithIdentifier("27", vehicleData_.cmuData[1].cellTemperature);
-   sendVariableWithIdentifier("28", vehicleData_.cmuData[1].cellVoltage[0]);
-   sendVariableWithIdentifier("29", vehicleData_.cmuData[1].cellVoltage[1]);
-   sendVariableWithIdentifier("30", vehicleData_.cmuData[1].cellVoltage[2]);
-   sendVariableWithIdentifier("31", vehicleData_.cmuData[1].cellVoltage[3]);
-   sendVariableWithIdentifier("32", vehicleData_.cmuData[1].cellVoltage[4]);
-   sendVariableWithIdentifier("33", vehicleData_.cmuData[1].cellVoltage[5]);
-   sendVariableWithIdentifier("34", vehicleData_.cmuData[1].cellVoltage[6]);
-   sendVariableWithIdentifier("35", vehicleData_.cmuData[1].cellVoltage[7]);
-   sendVariableWithIdentifier("36", vehicleData_.cmuData[2].pcbTemperature);
-   sendVariableWithIdentifier("37", vehicleData_.cmuData[2].cellTemperature);
-   sendVariableWithIdentifier("38", vehicleData_.cmuData[2].cellVoltage[0]);
-   sendVariableWithIdentifier("39", vehicleData_.cmuData[2].cellVoltage[1]);
-   sendVariableWithIdentifier("40", vehicleData_.cmuData[2].cellVoltage[2]);
-   sendVariableWithIdentifier("41", vehicleData_.cmuData[2].cellVoltage[3]);
-   sendVariableWithIdentifier("42", vehicleData_.cmuData[2].cellVoltage[4]);
-   sendVariableWithIdentifier("43", vehicleData_.cmuData[2].cellVoltage[5]);
-   sendVariableWithIdentifier("44", vehicleData_.cmuData[2].cellVoltage[6]);
-   sendVariableWithIdentifier("45", vehicleData_.cmuData[2].cellVoltage[7]);
-   sendVariableWithIdentifier("46", vehicleData_.cmuData[3].pcbTemperature);
-   sendVariableWithIdentifier("47", vehicleData_.cmuData[3].cellTemperature);
-   sendVariableWithIdentifier("48", vehicleData_.cmuData[3].cellVoltage[0]);
-   sendVariableWithIdentifier("49", vehicleData_.cmuData[3].cellVoltage[1]);
-   sendVariableWithIdentifier("50", vehicleData_.cmuData[3].cellVoltage[2]);
-   sendVariableWithIdentifier("51", vehicleData_.cmuData[3].cellVoltage[3]);
-   sendVariableWithIdentifier("52", vehicleData_.cmuData[3].cellVoltage[4]);
-   sendVariableWithIdentifier("53", vehicleData_.cmuData[3].cellVoltage[5]);
-   sendVariableWithIdentifier("54", vehicleData_.cmuData[3].cellVoltage[6]);
-   sendVariableWithIdentifier("55", vehicleData_.cmuData[3].cellVoltage[7]);   
-   sendVariableWithIdentifier("56", vehicleData_.batteryVoltage);
-   sendVariableWithIdentifier("57", vehicleData_.batteryCurrent);
-   sendVariableWithIdentifier("58", vehicleData_.batteryVoltageThresholdRising);
-   sendVariableWithIdentifier("59", vehicleData_.batteryVoltageThresholdFalling);
-}
-
-int TelemetryReporting::fixPointApproixmation(const float input)
-{
-   return static_cast<int>(input * 1000.0f); 
-}
-
-void TelemetryReporting::sendVariable(const int input)
-{
-   unsigned int bitsToSend = static_cast<unsigned int>(input);
-
-   for (int i = 0; i < sizeof(bitsToSend); ++i)
+   switch (timer_)
    {
-      bluetooth_.putc(bitsToSend & 0xFF);
-      bitsToSend = bitsToSend >> 8;
+   case 0:
+      sendDriverControlDetails();
+      sendMpptData(0);
+      break;
+   case 1:
+      sendBatteryData();
+      sendMpptData(1);
+      break;
+   case 2:
+      sendCmuData(0);
+      sendMpptData(2);
+      break;
+   case 3:
+      sendCmuData(1);
+      sendMpptData(3);
+      break;
+   case 4:
+      sendCmuData(2);
+      sendMpptData(4);
+      break;
+   case 5:
+      sendCmuData(3);
+      sendMpptData(5);
+      break;
+   case 6:
+      sendMpptData(6);
+      break;
+   }
+
+   if (timer_ >= 6)
+   {
+      timer_ = 0;
+   }
+   else
+   {
+      timer_++;
    }
 }
 
-void TelemetryReporting::sendFloatWithIdentifier(const char* identifier, const float input)
+void TelemetryReporting::sendKeyDriverControlTelemetry()
 {
-   char identifierString[50];
-   sprintf(identifierString, "#%s", identifier);
-   bluetooth_.puts(identifierString);
-   int dataToSend = fixPointApproixmation(input);
-   sendVariable(dataToSend);
-   bluetooth_.putc('\n');
+   const unsigned int unframedPacketLength = KEY_DRIVER_CONTROL_LENGTH + CHECKSUM_LENGTH;
+   unsigned char packetPayload[unframedPacketLength];
+   packetPayload[0] = KEY_DRIVER_CONTROL_ID;
+   const float driverSetSpeedMps = vehicleData_.driverSetSpeedRpm * CcsDefines::RPM_TO_MPS_CONVERSION;
+   writeFloatIntoData(packetPayload, 1, driverSetSpeedMps);
+   writeFloatIntoData(packetPayload, 5, vehicleData_.driverSetCurrent);
+   writeFloatIntoData(packetPayload, 9, vehicleData_.busCurrent);
+   writeFloatIntoData(packetPayload, 13, vehicleData_.busVoltage);
+   writeFloatIntoData(packetPayload, 17, vehicleData_.vehicleVelocity);
+
+   addChecksum(packetPayload, KEY_DRIVER_CONTROL_LENGTH);
+   unsigned char packet[unframedPacketLength + FRAMING_LENGTH_INCREASE];
+   unsigned int packetLength = frameData(packetPayload, unframedPacketLength, packet);
+   sendData(packet, packetLength);
 }
 
-template <typename T>
-void TelemetryReporting::sendVariableWithIdentifier(const char* identifier, const T input)
+void TelemetryReporting::sendDriverControlDetails()
 {
-   char identifierString[50];
-   sprintf(identifierString, "#%s", identifier);
-   bluetooth_.puts(identifierString);  
-   sendVariable(static_cast<int>(input));
-   bluetooth_.putc('\n');
+   const unsigned int unframedPacketLength = DRIVER_CONTROL_DETAILS_LENGTH + CHECKSUM_LENGTH;
+   unsigned char packetPayload[unframedPacketLength];
+   packetPayload[0] = DRIVER_CONTROL_DETAILS_ID;
+   writeFloatIntoData(packetPayload, 1, vehicleData_.motorVelocityRpm);
+   writeFloatIntoData(packetPayload, 5, vehicleData_.motorVoltageReal);
+   writeFloatIntoData(packetPayload, 9, vehicleData_.motorCurrentReal);
+   writeFloatIntoData(packetPayload, 13, vehicleData_.backEmfImaginary);
+   writeFloatIntoData(packetPayload, 17, vehicleData_.dspBoardTemp);
+   writeFloatIntoData(packetPayload, 21, vehicleData_.dcBusAmpHours);
+   writeFloatIntoData(packetPayload, 25, vehicleData_.odometer);
+
+   addChecksum(packetPayload, DRIVER_CONTROL_DETAILS_LENGTH);
+   unsigned char packet[unframedPacketLength + FRAMING_LENGTH_INCREASE];
+   unsigned int packetLength = frameData(packetPayload, unframedPacketLength, packet);
+   sendData(packet, packetLength);
+}
+
+void TelemetryReporting::sendFaults()
+{
+   const unsigned int unframedPacketLength = FAULT_LENGTH + CHECKSUM_LENGTH;
+   unsigned char packetPayload[unframedPacketLength];
+   packetPayload[0] = FAULT_ID;
+   packetPayload[1] = static_cast<unsigned char>(0xFF & vehicleData_.errorFlags);
+   packetPayload[2] = static_cast<unsigned char>(0xFF & vehicleData_.limitFlags);
+   packetPayload[3] = static_cast<unsigned char>(0xFF & vehicleData_.bmuStatusFlagsExtended);
+   packetPayload[4] = static_cast<unsigned char>(0xFF & (vehicleData_.bmuStatusFlagsExtended >> 8));
+   packetPayload[5] = vehicleData_.receivedErrorCount;
+   packetPayload[6] = vehicleData_.transmittedErrorCount;
+
+   addChecksum(packetPayload, FAULT_LENGTH);
+   unsigned char packet[unframedPacketLength + FRAMING_LENGTH_INCREASE];
+   unsigned int packetLength = frameData(packetPayload, unframedPacketLength, packet);
+   sendData(packet, packetLength);
+}
+
+void TelemetryReporting::sendBatteryData()
+{
+   const unsigned int unframedPacketLength = BATTERY_DATA_LENGTH + CHECKSUM_LENGTH;
+   unsigned char packetPayload[unframedPacketLength];
+   packetPayload[0] = BATTERY_DATA_ID;
+   writeFloatIntoData(packetPayload, 1, vehicleData_.batteryVoltage);
+   writeFloatIntoData(packetPayload, 5, vehicleData_.batteryCurrent);
+   writeFloatIntoData(packetPayload, 9, vehicleData_.packStateOfChargePercentage);
+   writeFloatIntoData(packetPayload, 13, vehicleData_.balancePackStateOfCharge);
+   packetPayload[17] = static_cast<unsigned char>(vehicleData_.secondaryBatteryUnderVoltage);
+
+   addChecksum(packetPayload, BATTERY_DATA_LENGTH);
+   unsigned char packet[unframedPacketLength + FRAMING_LENGTH_INCREASE];
+   unsigned int packetLength = frameData(packetPayload, unframedPacketLength, packet);
+   sendData(packet, packetLength);
+}
+
+void TelemetryReporting::sendCmuData(unsigned char cmuDataIndex)
+{
+   const unsigned int unframedPacketLength = CMU_DATA_LENGTH + CHECKSUM_LENGTH;
+   unsigned char packetPayload[unframedPacketLength];
+   packetPayload[0] = CMU_DATA_ID;
+   packetPayload[1] = cmuDataIndex;
+   writeFloatIntoData(packetPayload, 2, vehicleData_.cmuData[cmuDataIndex].pcbTemperature);
+   writeFloatIntoData(packetPayload, 6, vehicleData_.cmuData[cmuDataIndex].cellTemperature);
+   writeFloatIntoData(packetPayload, 10, vehicleData_.cmuData[cmuDataIndex].cellVoltage[0]);
+   writeFloatIntoData(packetPayload, 14, vehicleData_.cmuData[cmuDataIndex].cellVoltage[1]);
+   writeFloatIntoData(packetPayload, 18, vehicleData_.cmuData[cmuDataIndex].cellVoltage[2]);
+   writeFloatIntoData(packetPayload, 22, vehicleData_.cmuData[cmuDataIndex].cellVoltage[3]);
+   writeFloatIntoData(packetPayload, 26, vehicleData_.cmuData[cmuDataIndex].cellVoltage[4]);
+   writeFloatIntoData(packetPayload, 30, vehicleData_.cmuData[cmuDataIndex].cellVoltage[5]);
+   writeFloatIntoData(packetPayload, 34, vehicleData_.cmuData[cmuDataIndex].cellVoltage[6]);
+   writeFloatIntoData(packetPayload, 38, vehicleData_.cmuData[cmuDataIndex].cellVoltage[7]);
+
+   addChecksum(packetPayload, CMU_DATA_LENGTH);
+   unsigned char packet[unframedPacketLength + FRAMING_LENGTH_INCREASE];
+   unsigned int packetLength = frameData(packetPayload, unframedPacketLength, packet);
+   sendData(packet, packetLength);
+}
+
+void TelemetryReporting::sendMpptData(unsigned char mpptDataIndex)
+{
+   const unsigned int unframedPacketLength = MPPT_DATA_LENGTH + CHECKSUM_LENGTH;
+   unsigned char packetPayload[unframedPacketLength];
+   packetPayload[0] = MPPT_DATA_ID;
+   packetPayload[1] = mpptDataIndex;
+   packetPayload[2] = static_cast<unsigned char>(vehicleData_.mpptData[mpptDataIndex].type);
+
+   if (vehicleData_.mpptData[mpptDataIndex].type == MpptData::Helianthus)
+   {
+      packetPayload[3] = 0x1F;
+   }
+   else
+   {
+      packetPayload[3] = 0x03;
+   }
+   writeFloatIntoData(packetPayload, 4, vehicleData_.mpptData[mpptDataIndex].voltageIn);
+   writeFloatIntoData(packetPayload, 8, vehicleData_.mpptData[mpptDataIndex].currentIn);
+   writeFloatIntoData(packetPayload, 12, vehicleData_.mpptData[mpptDataIndex].voltageOut);
+   writeFloatIntoData(packetPayload, 16, vehicleData_.mpptData[mpptDataIndex].currentOut);
+   packetPayload[20] = static_cast<unsigned char>(vehicleData_.mpptData[mpptDataIndex].mode);
+
+   addChecksum(packetPayload, MPPT_DATA_LENGTH);
+   unsigned char packet[unframedPacketLength + FRAMING_LENGTH_INCREASE];
+   unsigned int packetLength = frameData(packetPayload, unframedPacketLength, packet);
+   sendData(packet, packetLength);
+}
+
+unsigned int TelemetryReporting::frameData(const unsigned char* dataToEncode,
+      unsigned long length, unsigned char* frameData)
+{
+   unsigned int lengthOfFramedData =
+      stuffData(dataToEncode, length, frameData);
+   frameData[lengthOfFramedData++] = TERMINATING_BYTE;
+   return lengthOfFramedData;
+}
+
+#define FINISH_BLOCK(X) \
+{\
+   *code_ptr = (X); \
+   code_ptr = encodedData++; \
+   code = 0x01; \
+}
+
+unsigned int TelemetryReporting::stuffData(const unsigned char* dataToEncode,
+      unsigned long length, unsigned char* encodedData)
+{
+   unsigned int lengthOfEncodedData = length + 1;
+   const unsigned char* end = dataToEncode + length;
+   unsigned char* code_ptr = encodedData++;
+   unsigned char code = 0x01;
+
+   while (dataToEncode < end)
+   {
+      if (*dataToEncode == 0)
+      {
+         FINISH_BLOCK(code);
+      }
+      else
+      {
+         *encodedData++ = *dataToEncode;
+         code++;
+         if (code == 0xFF)
+         {
+            FINISH_BLOCK(code);
+            lengthOfEncodedData++;
+         }
+      }
+      dataToEncode++;
+   }
+   FINISH_BLOCK(code);
+   return lengthOfEncodedData;
+}
+#undef FINISH_BLOCK
+
+void TelemetryReporting::addChecksum(unsigned char* data, unsigned int length)
+{
+   unsigned short crc16 = CrcCalculator::calculateCrc16(data, length);
+   data[length] = static_cast<unsigned char>(0xFF & crc16);
+   data[length + 1] = static_cast<unsigned char>(0xFF & (crc16 >> 8));
+}
+
+void TelemetryReporting::writeFloatIntoData(unsigned char* data, int index, const float& value)
+{
+   FloatDataUnion floatDataUnion;
+   floatDataUnion.floatData = value;
+   data[index++] = floatDataUnion.charData[0];
+   data[index++] = floatDataUnion.charData[1];
+   data[index++] = floatDataUnion.charData[2];
+   data[index] = floatDataUnion.charData[3];
+}
+
+void TelemetryReporting::sendData(const unsigned char* data, int length)
+{
+   for (int i = 0; i < length; ++i)
+   {
+      uart_.putc(data[i]);
+   }
 }
