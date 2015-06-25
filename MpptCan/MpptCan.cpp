@@ -28,8 +28,8 @@ namespace
       Dilithium1 = 0x0601,
       Dilithium2 = 0x0602,
       Dilithium3 = 0x0603,
-      HelianthusBase = 0x500,
-      HelianthusModeSelection = 0x400
+      HelianthusBase = 0x400,
+      HelianthusModeSelection = 0x300
    };
 }
 
@@ -177,7 +177,7 @@ void MpptCan::readOutput(int mpptNumber, const unsigned char* messageData)
 
 bool MpptCan::getHelianthusMessageNumbers(const unsigned int id, int& mpptNumber, int& messageNumber)
 {
-   if ((id & 0xF00) == 0x400)
+   if ((id & 0xF00) == HelianthusBase)
    {
       mpptNumber = (id & 0x0F0) >> 8;
       messageNumber = (id & 0x00F);
