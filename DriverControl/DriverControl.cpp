@@ -31,10 +31,10 @@ DriverControl::DriverControl(const PinName& deadmanInput,
 , leftBlinkerInput_(leftBlinkerInput)
 , brakeInput_(brakeInput)
 , directionInput_(directionInput)
+, mpptModeInput_(mpptModeInput)
 , currentInput_(currentInput)
 , regenInput_(regenInput)
 , vehicleData_(vehicleData)
-, mpptModeInput_(mpptModeInput)
 , currentIndexRegenBrakingDataAverage_(0)
 , currentIndexCurrentDataAverage_(0)
 {
