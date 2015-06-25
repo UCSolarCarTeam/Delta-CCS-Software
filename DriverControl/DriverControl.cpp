@@ -133,7 +133,7 @@ void DriverControl::setRegenSpeedAndCurrent()
 {
    vehicleData_.driverSetSpeedRpm = 0.0f;
    vehicleData_.driverSetCurrentPercentage =
-      calculateRunningAverage(runningAverageCurrentData_) * MAX_CURRENT_PERCENT_REGEN;
+      calculateRunningAverage(runningAverageRegenBrakingData_) * MAX_CURRENT_PERCENT_REGEN;
    vehicleData_.driverSetCurrent =
       vehicleData_.driverSetCurrentPercentage * MAX_CURRENT_AMPS;
 }
