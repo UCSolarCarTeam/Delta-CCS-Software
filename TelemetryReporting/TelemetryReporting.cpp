@@ -221,7 +221,7 @@ void TelemetryReporting::sendMpptData(unsigned char mpptDataIndex)
    }
    else
    {
-      packetPayload[3] = 0x03;
+      packetPayload[3] = 0x07;
    }
    writeFloatIntoData(packetPayload, 4, vehicleData_.mpptData[mpptDataIndex].voltageIn);
    writeFloatIntoData(packetPayload, 8, vehicleData_.mpptData[mpptDataIndex].currentIn);

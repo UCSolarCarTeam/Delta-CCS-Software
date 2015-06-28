@@ -12,8 +12,8 @@ union CanMessageFormatter
    float floatData[2];
    unsigned char unsignedCharData[8];
    char charData[8];
-   unsigned int unsignedIntData[4];
-   int intData[4];
+   unsigned short unsignedShortData[4];
+   short shortData[4];
    unsigned long unsignedLongData[2];
    long longData[2];
 };
@@ -140,9 +140,9 @@ void MpptCan::readDilithiumMessage(int mpptNumber, const unsigned char* messageD
    CanMessageFormatter formatter;
    populateCanMessageFormatter(messageData, formatter);
    const int mpptDataIndex = returnMpptDataIndexForMpptNumber(MpptData::Dilithium, mpptNumber);
-   vehicleData_.mpptData[mpptDataIndex].voltageIn = formatter.unsignedIntData[0] / 100.0;
-   vehicleData_.mpptData[mpptDataIndex].currentIn = formatter.unsignedIntData[1] / 1000.0;
-   vehicleData_.mpptData[mpptDataIndex].voltageOut = formatter.unsignedIntData[2] / 100.0;
+   vehicleData_.mpptData[mpptDataIndex].voltageIn = formatter.unsignedShortData[0] / 100.0;
+   vehicleData_.mpptData[mpptDataIndex].currentIn = formatter.unsignedShortData[1] / 1000.0;
+   vehicleData_.mpptData[mpptDataIndex].voltageOut = formatter.unsignedShortData[2] / 100.0;
    vehicleData_.mpptData[mpptDataIndex].currentOut = -1.0f;
 }
 

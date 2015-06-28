@@ -14,8 +14,8 @@ union TritiumDataFormatter
    float floatData[2];
    unsigned char unsignedCharData[8];
    char charData[8];
-   unsigned int unsignedIntData[4];
-   int intData[4];
+   unsigned short unsignedShortData[4];
+   short shortData[4];
    unsigned long unsignedLongData[2];
    long longData[2];
 };
@@ -381,26 +381,26 @@ void MotorControllerCan::readCmuCellTemp(const unsigned char* messageData, int c
 {
    TritiumDataFormatter messageDataFormatted;
    populateTritiumDataFormatter(messageData, messageDataFormatted);
-   vehicleData_.cmuData[cmuCellNumber].pcbTemperature = messageDataFormatted.intData[2] / 10.0;
-   vehicleData_.cmuData[cmuCellNumber].cellTemperature = messageDataFormatted.intData[3] / 10.0;
+   vehicleData_.cmuData[cmuCellNumber].pcbTemperature = messageDataFormatted.shortData[2] / 10.0;
+   vehicleData_.cmuData[cmuCellNumber].cellTemperature = messageDataFormatted.shortData[3] / 10.0;
 }
 void MotorControllerCan::readCmuCellGroup1(const unsigned char* messageData, int cmuCellNumber)
 {
    TritiumDataFormatter messageDataFormatted;
    populateTritiumDataFormatter(messageData, messageDataFormatted);
-   vehicleData_.cmuData[cmuCellNumber].cellVoltage[0] = messageDataFormatted.intData[0] / 1000.0;
-   vehicleData_.cmuData[cmuCellNumber].cellVoltage[1] = messageDataFormatted.intData[1] / 1000.0;
-   vehicleData_.cmuData[cmuCellNumber].cellVoltage[2] = messageDataFormatted.intData[2] / 1000.0;
-   vehicleData_.cmuData[cmuCellNumber].cellVoltage[3] = messageDataFormatted.intData[3] / 1000.0;
+   vehicleData_.cmuData[cmuCellNumber].cellVoltage[0] = messageDataFormatted.shortData[0] / 1000.0;
+   vehicleData_.cmuData[cmuCellNumber].cellVoltage[1] = messageDataFormatted.shortData[1] / 1000.0;
+   vehicleData_.cmuData[cmuCellNumber].cellVoltage[2] = messageDataFormatted.shortData[2] / 1000.0;
+   vehicleData_.cmuData[cmuCellNumber].cellVoltage[3] = messageDataFormatted.shortData[3] / 1000.0;
 }
 void MotorControllerCan::readCmuCellGroup2(const unsigned char* messageData, int cmuCellNumber)
 {
    TritiumDataFormatter messageDataFormatted;
    populateTritiumDataFormatter(messageData, messageDataFormatted);
-   vehicleData_.cmuData[cmuCellNumber].cellVoltage[4] = messageDataFormatted.intData[0] / 1000.0;
-   vehicleData_.cmuData[cmuCellNumber].cellVoltage[5] = messageDataFormatted.intData[1] / 1000.0;
-   vehicleData_.cmuData[cmuCellNumber].cellVoltage[6] = messageDataFormatted.intData[2] / 1000.0;
-   vehicleData_.cmuData[cmuCellNumber].cellVoltage[7] = messageDataFormatted.intData[3] / 1000.0;
+   vehicleData_.cmuData[cmuCellNumber].cellVoltage[4] = messageDataFormatted.shortData[0] / 1000.0;
+   vehicleData_.cmuData[cmuCellNumber].cellVoltage[5] = messageDataFormatted.shortData[1] / 1000.0;
+   vehicleData_.cmuData[cmuCellNumber].cellVoltage[6] = messageDataFormatted.shortData[2] / 1000.0;
+   vehicleData_.cmuData[cmuCellNumber].cellVoltage[7] = messageDataFormatted.shortData[3] / 1000.0;
 }
 void MotorControllerCan::readStateOfCharge(const unsigned char* messageData)
 {
@@ -422,7 +422,7 @@ void MotorControllerCan::readPrechargeState(const unsigned char* messageData)
    populateTritiumDataFormatter(messageData, messageDataFormatted);
    vehicleData_.prechargeDriverStatusFlags = messageDataFormatted.unsignedCharData[0];
    vehicleData_.prechargeState = messageDataFormatted.unsignedCharData[1];
-   vehicleData_.contactorSupplyVoltage = messageDataFormatted.unsignedIntData[1];
+   vehicleData_.contactorSupplyVoltage = messageDataFormatted.unsignedShortData[1];
    vehicleData_.prechargeTimerElapsedFlag = messageDataFormatted.unsignedCharData[6];
    vehicleData_.prechargeTimerCounter = messageDataFormatted.unsignedCharData[7];
 }
@@ -437,17 +437,17 @@ void MotorControllerCan::readPackStatus(const unsigned char* messageData)
 {
    TritiumDataFormatter messageDataFormatted;
    populateTritiumDataFormatter(messageData, messageDataFormatted);
-   vehicleData_.batteryVoltageThresholdRising = messageDataFormatted.unsignedIntData[0];
-   vehicleData_.batteryVoltageThresholdFalling = messageDataFormatted.unsignedIntData[1];
+   vehicleData_.batteryVoltageThresholdRising = messageDataFormatted.unsignedShortData[0];
+   vehicleData_.batteryVoltageThresholdFalling = messageDataFormatted.unsignedShortData[1];
 }
 void MotorControllerCan::readPackFanStatus(const unsigned char* messageData)
 {
    TritiumDataFormatter messageDataFormatted;
    populateTritiumDataFormatter(messageData, messageDataFormatted);
-   vehicleData_.fanSpeed0 = messageDataFormatted.unsignedIntData[0];
-   vehicleData_.fanSpeed1 = messageDataFormatted.unsignedIntData[1];
-   vehicleData_.fanCurrentConsumption = messageDataFormatted.unsignedIntData[2];
-   vehicleData_.cmuCurrentConsumption = messageDataFormatted.unsignedIntData[3];
+   vehicleData_.fanSpeed0 = messageDataFormatted.unsignedShortData[0];
+   vehicleData_.fanSpeed1 = messageDataFormatted.unsignedShortData[1];
+   vehicleData_.fanCurrentConsumption = messageDataFormatted.unsignedShortData[2];
+   vehicleData_.cmuCurrentConsumption = messageDataFormatted.unsignedShortData[3];
 }
 void MotorControllerCan::readExtendedPackStatus(const unsigned char* messageData)
 {
