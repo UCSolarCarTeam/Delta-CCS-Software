@@ -18,8 +18,8 @@ namespace
    const PinName& CAN_MPPT_RD = p9;
    const PinName& CAN_MPPT_TD = p10;
 
-   const PinName& PIN_DISPLAY_CHAR_2_CS = p11;
-   const PinName& PIN_DISPLAY_CHAR_3_CS = p12;
+   const PinName& PIN_DISPLAY_CHAR_3_CS = p11;
+   const PinName& PIN_DISPLAY_CHAR_2_CS = p12;
 
    const PinName& MPPT_MODE_SWITCH = p13;
    const PinName& PIN_DEADMAN_INPUT = p14;
