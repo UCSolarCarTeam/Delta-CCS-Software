@@ -12,7 +12,7 @@ namespace CcsDefines
    // Wavesculptor 22 requires velocity in RPM
    const unsigned int MAX_FORWARD_RPM = 1000; //Was 1298 on old system
    const unsigned int MAX_REVERSE_RPM = 200;
-   const unsigned int MAX_CURRENT_AMPS = 40;
+   const unsigned int MAX_CURRENT_AMPS = 65;
    const float MAX_CURRENT_PERCENT_REGEN = 0.3f;
    //RPM to Kph is wheel diameter * pi * 60 s / 1000 m
    const float RPM_TO_KPH_CONVERSION = 0.545 * 3.14159265358979323 * 60.0 / 1000.0;
