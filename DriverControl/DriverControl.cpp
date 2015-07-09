@@ -124,7 +124,7 @@ void DriverControl::setMovementSpeedAndCurrent(VehicleData::CarDirection directi
    }
    else
    {
-      vehicleData_.driverSetSpeedRpm = -MAX_REVERSE_RPM;
+      vehicleData_.driverSetSpeedRpm = MAX_REVERSE_RPM;
    }
    vehicleData_.driverSetCurrentPercentage = calculateRunningAverage(runningAverageCurrentData_);
    vehicleData_.driverSetCurrent = vehicleData_.driverSetCurrentPercentage * MAX_CURRENT_AMPS;
@@ -134,9 +134,9 @@ void DriverControl::setRegenSpeedAndCurrent()
 {
    vehicleData_.driverSetSpeedRpm = 0.0f;
    vehicleData_.driverSetCurrentPercentage =
-      calculateRunningAverage(runningAverageRegenBrakingData_) * MAX_CURRENT_PERCENT_REGEN;
+      calculateRunningAverage(runningAverageRegenBrakingData_);
    vehicleData_.driverSetCurrent =
-      vehicleData_.driverSetCurrentPercentage * MAX_CURRENT_AMPS;
+      vehicleData_.driverSetCurrentPercentage * MAX_REGEN_CURRENT_AMPS;
 }
 
 void DriverControl::zeroDriverInputs()
