@@ -421,7 +421,8 @@ void MotorControllerCan::readPrechargeState(const unsigned char* messageData)
    TritiumDataFormatter messageDataFormatted;
    populateTritiumDataFormatter(messageData, messageDataFormatted);
    vehicleData_.prechargeDriverStatusFlags = messageDataFormatted.unsignedCharData[0];
-   vehicleData_.prechargeState = messageDataFormatted.unsignedCharData[1];
+   vehicleData_.prechargeState =
+      static_cast<VehicleData::PrechargeStates>(messageDataFormatted.unsignedCharData[1]);
    vehicleData_.contactorSupplyVoltage = messageDataFormatted.unsignedShortData[1];
    vehicleData_.prechargeTimerElapsedFlag = messageDataFormatted.unsignedCharData[6];
    vehicleData_.prechargeTimerCounter = messageDataFormatted.unsignedCharData[7];

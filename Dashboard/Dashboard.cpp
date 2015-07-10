@@ -18,6 +18,14 @@ namespace
    const char MPPT_OPEN_MODE[] = "Open";
    const char MPPT_INVALID_MODE[] = "Invalid";
 
+   const char BMU_PRECHARGE_ERROR[] = "Error";
+   const char BMU_PRECHARGE_IDLE[] = "Idle";
+   const char BMU_PRECHARGE_ENABLE_PACK[] = "Enable Pack";
+   const char BMU_PRECHARGE_MEASURE[] = "Measure";
+   const char BMU_PRECHARGE_PRECHARGE[] = "Precharge";
+   const char BMU_PRECHARGE_RUN[] = "Run";
+   const char BMU_PRECHARGE_INVALID[] = "Invalid";
+
    const char* getMpptModeString(MpptData::Mode mode)
    {
       switch(mode)
@@ -32,6 +40,27 @@ namespace
          return MPPT_OPEN_MODE;
       default:
          return MPPT_INVALID_MODE;
+      }
+   }
+
+   const char* getPrechargeStateString(VehicleData::PrechargeStates state)
+   {
+      switch(state)
+      {
+      case VehicleData::Error:
+         return BMU_PRECHARGE_ERROR;
+      case VehicleData::Idle:
+         return BMU_PRECHARGE_IDLE;
+      case VehicleData::EnablePack:
+         return BMU_PRECHARGE_ENABLE_PACK;
+      case VehicleData::Measure:
+         return BMU_PRECHARGE_MEASURE;
+      case VehicleData::Precharge:
+         return BMU_PRECHARGE_PRECHARGE;
+      case VehicleData::Run:
+         return BMU_PRECHARGE_RUN;
+      default:
+         return BMU_PRECHARGE_INVALID;
       }
    }
 }
@@ -129,7 +158,7 @@ void Dashboard::updateDisplay2()
    memset(message3, ' ', 20);
    memset(message4, ' ', 20);
 
-   sprintf(message1, "Bus Current: %5.1f A", vehicleData_.busCurrent);
+   sprintf(message1, "Bat Current: %5.1f A", vehicleData_.batteryCurrent);
    sprintf(message2, "Bus Voltage: %5.1f V", vehicleData_.busVoltage);
    const float power = vehicleData_.busVoltage * vehicleData_.busCurrent;
    sprintf(message3, "Power Draw:  %5.1f W", power);
@@ -165,8 +194,7 @@ void Dashboard::updateDisplay3()
    sprintf(message1, "Mode cmd:    %s", getMpptModeString(commandedMpptMode));
    const MpptData::Mode reportedMpptMode = vehicleData_.mpptData[HELIANTHUS_MPPT_INDEX].mode;
    sprintf(message2, "Mode rpt:    %s", getMpptModeString(reportedMpptMode));
-   const bool majorBmuError = vehicleData_.bmuStatusFlagsExtended & CcsDefines::MAJOR_BMU_ERROR_MASK;
-   sprintf(message3, "%s", majorBmuError ? "BMU state:   error!":"BMU state:   Okay");
+   sprintf(message3, "BMU State: %s", getPrechargeStateString(vehicleData_.prechargeState));
    const bool majorMcError = vehicleData_.errorFlags & CcsDefines::MAJOR_MC_ERROR_MASK;
    sprintf(message4, "%s", majorMcError ? "MC state:    error!":"MC state:    Okay");
 

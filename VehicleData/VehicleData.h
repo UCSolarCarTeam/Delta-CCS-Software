@@ -21,6 +21,16 @@ struct VehicleData
 
    enum CarDirection {Forward = 0, Reverse = 1};
 
+   enum PrechargeStates
+   {
+      Error = 0,
+      Idle = 1,
+      EnablePack = 5,
+      Measure = 2,
+      Precharge = 3,
+      Run = 4,
+   };
+
    //Driver inputs
    float reportedMotorCurrent;
    float driverSetCurrent;
@@ -59,7 +69,7 @@ struct VehicleData
    float balancePackStateOfCharge;
    float balancePackStateOfChargePercentage;
    unsigned char prechargeDriverStatusFlags;
-   unsigned char prechargeState;
+   PrechargeStates prechargeState;
    unsigned int contactorSupplyVoltage;
    unsigned int prechargeTimerElapsedFlag;
    unsigned int prechargeTimerCounter;

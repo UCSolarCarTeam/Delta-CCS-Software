@@ -13,7 +13,7 @@ namespace CcsDefines
    const int MAX_FORWARD_RPM = 1000; //Was 1298 on old system
    const int MAX_REVERSE_RPM = -200;
    const float MAX_CURRENT_AMPS = 70.0;
-   const float MAX_REGEN_CURRENT_AMPS = 30.0;
+   const float MAX_REGEN_CURRENT_AMPS = 25.0;
    //RPM to Kph is wheel diameter * pi * 60 s / 1000 m
    const float RPM_TO_KPH_CONVERSION = 0.545 * 3.14159265358979323 * 60.0 / 1000.0;
    const float RPM_TO_MPS_CONVERSION = 0.545 * 3.14159265358979323 / 60.0;
