@@ -35,8 +35,8 @@ private:
 
    void sendConfigurationMessage();
 
-   void readStatus(const unsigned char* messageData);
-   void readbusCurrentA(const unsigned char* messageData);
+   void readStatus(const unsigned char* messageData, int motorNumber);
+   void readBusCurrentA(const unsigned char* messageData);
    void readVelocity(const unsigned char* messageData);
    void readPhaseCurrent(const unsigned char* messageData);
    void readVoltageVector(const unsigned char* messageData);

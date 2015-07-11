@@ -114,10 +114,13 @@ void MotorControllerCan::readCan()
       switch(messageReceived.id)
       {
       case MOTOR_ONE_BASE + STATUS:
-         readStatus(messageReceived.data);
+         readStatus(messageReceived.data, 1);
+         break;
+      case MOTOR_TWO_BASE + STATUS:
+         readStatus(messageReceived.data, 2);
          break;
       case MOTOR_ONE_BASE + BUS_MEASUREMENT:
-         readbusCurrentA(messageReceived.data);
+         readBusCurrentA(messageReceived.data);
          break;
       case MOTOR_ONE_BASE + VELOCITY_MEASUREMENT:
          readVelocity(messageReceived.data);
@@ -304,16 +307,27 @@ void MotorControllerCan::sendConfigurationMessage()
    motorControllerCan_.write(configurationMessage);
 }
 
-void MotorControllerCan::readStatus(const unsigned char* messageData)
+void MotorControllerCan::readStatus(const unsigned char* messageData, int motorNumber)
 {
-   vehicleData_.receivedErrorCount = messageData[7];
-   vehicleData_.transmittedErrorCount = messageData[6];
-   vehicleData_.activeMotor = messageData[5] << (8 + messageData[4]);
-   vehicleData_.errorFlags = messageData[3] << (8 + messageData[2]);
-   vehicleData_.limitFlags = messageData[1] << (8 + messageData[0]);
+   if (motorNumber == 1)
+   {
+      vehicleData_.motorOneReceivedErrorCount = messageData[7];
+      vehicleData_.motorOneTransmittedErrorCount = messageData[6];
+      vehicleData_.motorOneActiveMotor = (messageData[5] << 8) | messageData[4];
+      vehicleData_.motorOneErrorFlags = (messageData[3] << 8) | messageData[2];
+      vehicleData_.motorOneLimitFlags = (messageData[1] << 8) | messageData[0];
+   }
+   else
+   {
+      vehicleData_.motorTwoReceivedErrorCount = messageData[7];
+      vehicleData_.motorTwoTransmittedErrorCount = messageData[6];
+      vehicleData_.motorTwoActiveMotor = (messageData[5] << 8) | messageData[4];
+      vehicleData_.motorTwoErrorFlags = (messageData[3] << 8) | messageData[2];
+      vehicleData_.motorTwoLimitFlags = (messageData[1] << 8) | messageData[0];
+   }
 }
 
-void MotorControllerCan::readbusCurrentA(const unsigned char* messageData)
+void MotorControllerCan::readBusCurrentA(const unsigned char* messageData)
 {
    float receivedData[2];
    writeCharArrayToFloat(messageData, receivedData);

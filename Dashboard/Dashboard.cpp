@@ -195,7 +195,8 @@ void Dashboard::updateDisplay3()
    const MpptData::Mode reportedMpptMode = vehicleData_.mpptData[HELIANTHUS_MPPT_INDEX].mode;
    sprintf(message2, "Mode rpt:    %s", getMpptModeString(reportedMpptMode));
    sprintf(message3, "BMU State: %s", getPrechargeStateString(vehicleData_.prechargeState));
-   const bool majorMcError = vehicleData_.errorFlags & CcsDefines::MAJOR_MC_ERROR_MASK;
+   const bool majorMcError = (vehicleData_.motorOneErrorFlags | vehicleData_.motorTwoErrorFlags)
+      & CcsDefines::MAJOR_MC_ERROR_MASK;
    sprintf(message4, "%s", majorMcError ? "MC state:    error!":"MC state:    Okay");
 
    charDisplay3_.setLine(1);

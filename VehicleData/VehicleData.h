@@ -56,11 +56,17 @@ struct VehicleData
    float dspBoardTemp;
    float dcBusAmpHours;
    float odometer;
-   unsigned char receivedErrorCount;
-   unsigned char transmittedErrorCount;
-   short int activeMotor;
-   short int errorFlags;
-   short int limitFlags;
+   unsigned char motorOneReceivedErrorCount;
+   unsigned char motorOneTransmittedErrorCount;
+   short int motorOneActiveMotor;
+   short int motorOneErrorFlags;
+   short int motorOneLimitFlags;
+
+   unsigned char motorTwoReceivedErrorCount;
+   unsigned char motorTwoTransmittedErrorCount;
+   short int motorTwoActiveMotor;
+   short int motorTwoErrorFlags;
+   short int motorTwoLimitFlags;
 
    //BMU Data
    CmuData cmuData[4];

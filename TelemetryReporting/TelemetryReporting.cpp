@@ -27,7 +27,7 @@ namespace
    // These lengths only include the data. Not the checksum
    const unsigned int KEY_DRIVER_CONTROL_LENGTH = 21;
    const unsigned int DRIVER_CONTROL_DETAILS_LENGTH = 29;
-   const unsigned int FAULT_LENGTH = 7;
+   const unsigned int FAULT_LENGTH = 9;
    const unsigned int BATTERY_DATA_LENGTH = 18;
    const unsigned int CMU_DATA_LENGTH = 42;
    const unsigned int MPPT_DATA_LENGTH = 21;
@@ -154,12 +154,14 @@ void TelemetryReporting::sendFaults()
    const unsigned int unframedPacketLength = FAULT_LENGTH + CHECKSUM_LENGTH;
    unsigned char packetPayload[unframedPacketLength];
    packetPayload[0] = FAULT_ID;
-   packetPayload[1] = static_cast<unsigned char>(0xFF & vehicleData_.errorFlags);
-   packetPayload[2] = static_cast<unsigned char>(0xFF & vehicleData_.limitFlags);
-   packetPayload[3] = static_cast<unsigned char>(0xFF & vehicleData_.bmuStatusFlagsExtended);
-   packetPayload[4] = static_cast<unsigned char>(0xFF & (vehicleData_.bmuStatusFlagsExtended >> 8));
-   packetPayload[5] = vehicleData_.receivedErrorCount;
-   packetPayload[6] = vehicleData_.transmittedErrorCount;
+   packetPayload[1] = static_cast<unsigned char>(0xFF & vehicleData_.motorOneErrorFlags);
+   packetPayload[2] = static_cast<unsigned char>(0xFF & vehicleData_.motorOneLimitFlags);
+   packetPayload[3] = static_cast<unsigned char>(0xFF & vehicleData_.motorTwoErrorFlags);
+   packetPayload[4] = static_cast<unsigned char>(0xFF & vehicleData_.motorTwoLimitFlags);
+   packetPayload[5] = static_cast<unsigned char>(0xFF & vehicleData_.bmuStatusFlagsExtended);
+   packetPayload[6] = static_cast<unsigned char>(0xFF & (vehicleData_.bmuStatusFlagsExtended >> 8));
+   packetPayload[7] = vehicleData_.motorOneReceivedErrorCount;
+   packetPayload[8] = vehicleData_.motorOneTransmittedErrorCount;
 
    addChecksum(packetPayload, FAULT_LENGTH);
    unsigned char packet[unframedPacketLength + FRAMING_LENGTH_INCREASE];
