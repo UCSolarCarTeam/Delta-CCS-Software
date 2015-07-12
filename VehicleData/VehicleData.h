@@ -102,5 +102,9 @@ struct VehicleData
    bool brakelightOn;
    bool hazardsActivated;
 
+   // Power on inputs
+   bool arrayActivated;
+   bool highVoltageActivated;
+
    Serial pc;
 };

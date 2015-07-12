@@ -43,6 +43,10 @@ namespace
 
    const PinName& CAN_TD = p29;
    const PinName& CAN_RD = p30;
+
+   // These are the USB pins 31 and 32
+   const PinName& ARRAY_ON_INPUT = P0_29;
+   const PinName& HIGH_VOLTAGE_INPUT = P0_30;
 }
 
 Ccs::Ccs()
@@ -71,6 +75,8 @@ Ccs::Ccs()
    PIN_REGEN_INPUT,
    PIN_CAR_DIRECTION_INPUT,
    MPPT_MODE_SWITCH,
+   ARRAY_ON_INPUT,
+   HIGH_VOLTAGE_INPUT,
    vehicleData_)
 , dashboard_(
    PIN_DISPLAY_MOSI,

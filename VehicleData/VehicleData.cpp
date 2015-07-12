@@ -63,6 +63,8 @@ VehicleData::VehicleData()
 , rightBlinkerActivated(false)
 , brakelightOn(false)
 , hazardsActivated(false)
+, arrayActivated(false)
+, highVoltageActivated(false)
 , pc(USBTX, USBRX)
 {
 }

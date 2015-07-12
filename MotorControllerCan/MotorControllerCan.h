@@ -25,8 +25,11 @@ public:
 private:
    void readCan();
 
-   void sendSetbusCurrentALimitTo100Percent();
+   void sendSetBusCurrentALimitTo100Percent();
    void sendSetVelocityAndCurrent();
+
+   void sendBmuIdleCommand();
+   void sendBmuRunCommand();
 
    void requestResetOfMotorControllers();
    void sendResetMotorControllerOne();

@@ -21,6 +21,8 @@ public:
                  const PinName& regenInput,
                  const PinName& directionInput,
                  const PinName& mpptModeInput,
+                 const PinName& arrayOnInput,
+                 const PinName& highVoltageInput,
                  VehicleData& vehicleData);
 
    void initializeDriverControls();
@@ -50,6 +52,8 @@ private:
    DigitalIn brakeInput_;
    DigitalIn directionInput_;
    DigitalIn mpptModeInput_;
+   DigitalIn arrayOnInput_;
+   DigitalIn highVoltageInput_;
 
    AnalogIn currentInput_;
    AnalogIn regenInput_;

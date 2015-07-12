@@ -4,6 +4,7 @@
    Copyright (c) 2014 by University of Calgary Solar Car Team
 -------------------------------------------------------*/
 
+#include <CcsDefines.h>
 #include <MotorControllerCan.h>
 #include <VehicleData.h>
 
@@ -53,6 +54,7 @@ namespace
    const unsigned int DRIVER_CONTROL_CAN_BASE = 0x500;
    const unsigned int MOTOR_DRIVE = 1;
    const unsigned int POWER = 2;
+   const unsigned int BMU_STATE = 5;
 
 // Motor control CAN base address and offsets
    const unsigned int MOTOR_ONE_BASE = 0x0400;
@@ -71,6 +73,12 @@ namespace
    const unsigned int RESET = 25;
 
    const unsigned int DEVICE_SERIAL_NUMBER = 0x01;
+
+   // BMU state defines
+   // These numbers are not on any data sheet. Taken from
+   // APU code 2015-07-12
+   const unsigned char BMU_RUN_COMMAND = 0x72u;
+   const unsigned char BMU_IDLE_COMMAND = 0x02u;
 }
 
 MotorControllerCan::MotorControllerCan(
@@ -95,7 +103,7 @@ void MotorControllerCan::initInterface()
    wait_ms(20);
 
    sendConfigurationMessage();
-   sendSetbusCurrentALimitTo100Percent();
+   sendSetBusCurrentALimitTo100Percent();
 
    wait_ms(10);
 }
@@ -210,6 +218,17 @@ void MotorControllerCan::sendCanData()
    {
       resetMotorControllers();
    }
+
+   if (vehicleData_.highVoltageActivated &&
+      fabs(vehicleData_.batteryCurrent) <= CcsDefines::MAX_BATTERY_CURRENT)
+   {
+      sendBmuRunCommand();
+   }
+   else
+   {
+      sendBmuIdleCommand();
+   }
+
    sendSetVelocityAndCurrent();
 }
 
@@ -234,7 +253,23 @@ void MotorControllerCan::sendSetVelocityAndCurrent()
    motorControllerCan_.write(velocityAndCurrent);
 }
 
-void MotorControllerCan::sendSetbusCurrentALimitTo100Percent()
+void MotorControllerCan::sendBmuIdleCommand()
+{
+   CANMessage message;
+   message.id = DRIVER_CONTROL_CAN_BASE + BMU_STATE;
+   message.data[0] = BMU_IDLE_COMMAND;
+   motorControllerCan_.write(message);
+}
+
+void MotorControllerCan::sendBmuRunCommand()
+{
+   CANMessage message;
+   message.id = DRIVER_CONTROL_CAN_BASE + BMU_STATE;
+   message.data[0] = BMU_RUN_COMMAND;
+   motorControllerCan_.write(message);
+}
+
+void MotorControllerCan::sendSetBusCurrentALimitTo100Percent()
 {
    const unsigned int canAddress = DRIVER_CONTROL_CAN_BASE + POWER;
    float dataToSendFloat[2];

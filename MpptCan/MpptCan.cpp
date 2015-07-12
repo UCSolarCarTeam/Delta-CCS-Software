@@ -105,7 +105,16 @@ void MpptCan::sendMpptMode()
 {
    CANMessage message;
    message.id = static_cast<int>(HelianthusModeSelection);
-   message.data[0] = vehicleData_.dynamicModeActivated ? MpptData::Dynamic : MpptData::Static;
+
+   if (vehicleData_.arrayActivated)
+   {
+      message.data[0] = vehicleData_.dynamicModeActivated ? MpptData::Dynamic : MpptData::Static;
+   }
+   else
+   {
+      message.data[0] = MpptData::Open;
+   }
+
    mpptCan_.write(message);
 }
 
