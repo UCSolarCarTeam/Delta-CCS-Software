@@ -105,6 +105,7 @@ struct VehicleData
    // Power on inputs
    bool arrayActivated;
    bool highVoltageActivated;
+   bool overcurrentProtectionTripped;
 
    Serial pc;
 };

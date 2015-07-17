@@ -219,14 +219,21 @@ void MotorControllerCan::sendCanData()
       resetMotorControllers();
    }
 
+   checkIfOvercurrent();
+
    if (vehicleData_.highVoltageActivated &&
-      fabs(vehicleData_.batteryCurrent) <= CcsDefines::MAX_BATTERY_CURRENT)
+      !vehicleData_.overcurrentProtectionTripped)
    {
       sendBmuRunCommand();
    }
    else
    {
       sendBmuIdleCommand();
+   }
+
+   if (!vehicleData_.highVoltageActivated)
+   {
+      vehicleData_.overcurrentProtectionTripped = false;
    }
 
    sendSetVelocityAndCurrent();
@@ -527,3 +534,12 @@ void MotorControllerCan::populateTritiumDataFormatter(const unsigned char* input
    output.unsignedCharData[6] = input[6];
    output.unsignedCharData[7] = input[7];
 }
+
+void MotorControllerCan::checkIfOvercurrent()
+{
+   if (fabs(vehicleData_.batteryCurrent) <= CcsDefines::MAX_BATTERY_CURRENT)
+   {
+      vehicleData_.overcurrentProtectionTripped = true;
+   }
+}
+

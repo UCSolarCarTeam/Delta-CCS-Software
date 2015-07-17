@@ -63,6 +63,8 @@ private:
    void writeCharArrayToFloat(const unsigned char* input, float* output);
    void populateTritiumDataFormatter(const unsigned char* input, TritiumDataFormatter& output);
 
+   void checkIfOvercurrent();
+
 private:
    CAN motorControllerCan_;
    InterruptIn resetInput_;

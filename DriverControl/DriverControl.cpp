@@ -156,7 +156,7 @@ void DriverControl::readInputs()
    vehicleData_.hazardsActivated = hazardsInput_;
    vehicleData_.rightBlinkerActivated = rightBlinkerInput_;
    vehicleData_.leftBlinkerActivated = leftBlinkerInput_;
-   vehicleData_.brakelightOn = brakeInput_;
+   vehicleData_.brakelightOn = (brakeInput_ == 0); // Active low.
    vehicleData_.dynamicModeActivated = mpptModeInput_;
    vehicleData_.arrayActivated = arrayOnInput_;
    vehicleData_.highVoltageActivated = highVoltageInput_;

@@ -18,13 +18,13 @@ namespace
    const char MPPT_OPEN_MODE[] = "Open";
    const char MPPT_INVALID_MODE[] = "Invalid";
 
-   const char BMU_PRECHARGE_ERROR[] = "Error";
-   const char BMU_PRECHARGE_IDLE[] = "Idle";
-   const char BMU_PRECHARGE_ENABLE_PACK[] = "Enable Pack";
+   const char BMU_PRECHARGE_ERROR[] = "   Error";
+   const char BMU_PRECHARGE_IDLE[] = "   Idle";
+   const char BMU_PRECHARGE_ENABLE_PACK[] = "   Enable";
    const char BMU_PRECHARGE_MEASURE[] = "Measure";
    const char BMU_PRECHARGE_PRECHARGE[] = "Precharge";
-   const char BMU_PRECHARGE_RUN[] = "Run";
-   const char BMU_PRECHARGE_INVALID[] = "Invalid";
+   const char BMU_PRECHARGE_RUN[] = "   Run";
+   const char BMU_PRECHARGE_INVALID[] = "  Invalid";
 
    const char* getMpptModeString(MpptData::Mode mode)
    {

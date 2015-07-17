@@ -65,6 +65,7 @@ VehicleData::VehicleData()
 , hazardsActivated(false)
 , arrayActivated(false)
 , highVoltageActivated(false)
+, overcurrentProtectionTripped(false)
 , pc(USBTX, USBRX)
 {
 }
