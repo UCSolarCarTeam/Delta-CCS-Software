@@ -77,8 +77,8 @@ namespace
    // BMU state defines
    // These numbers are not on any data sheet. Taken from
    // APU code 2015-07-12
-   const unsigned char BMU_RUN_COMMAND = 0x72u;
-   const unsigned char BMU_IDLE_COMMAND = 0x02u;
+   const unsigned char BMU_RUN_COMMAND = 0x72;
+   const unsigned char BMU_IDLE_COMMAND = 0x02;
 }
 
 MotorControllerCan::MotorControllerCan(
@@ -537,7 +537,7 @@ void MotorControllerCan::populateTritiumDataFormatter(const unsigned char* input
 
 void MotorControllerCan::checkIfOvercurrent()
 {
-   if (fabs(vehicleData_.batteryCurrent) <= CcsDefines::MAX_BATTERY_CURRENT)
+   if (fabs(vehicleData_.batteryCurrent) > CcsDefines::MAX_BATTERY_CURRENT)
    {
       vehicleData_.overcurrentProtectionTripped = true;
    }
