@@ -28,6 +28,9 @@ namespace
       Dilithium1 = 0x0601,
       Dilithium2 = 0x0602,
       Dilithium3 = 0x0603,
+      Dilithium1State = 0x0611,
+      Dilithium2State = 0x0612,
+      Dilithium3State = 0x0613,
       HelianthusBase = 0x400,
       HelianthusModeSelection = 0x300
    };
@@ -88,6 +91,11 @@ void MpptCan::sendCanData()
       sendMpptMode();
       dilithiumQueryCounter_ = DILITHIUM_QUERY_COUNTER;
    }
+   else if(dilithiumQueryCounter_ == 1)
+   {
+      setDilithiumState(vehicleData_.arrayActivated);
+   }
+
    dilithiumQueryCounter_--;
 }
 
@@ -96,6 +104,22 @@ void MpptCan::queryForDilithiumData()
    CANMessage message1(Dilithium1);
    CANMessage message2(Dilithium2);
    CANMessage message3(Dilithium3);
+   mpptCan_.write(message1);
+   mpptCan_.write(message2);
+   mpptCan_.write(message3);
+}
+
+void MpptCan::setDilithiumState(bool mpptsOn)
+{
+   CANMessage message1;
+   CANMessage message2;
+   CANMessage message3;
+   message1.id = Dilithium1State;
+   message2.id = Dilithium2State;
+   message3.id = Dilithium3State;
+   message1.data[0] = static_cast<char>(mpptsOn);
+   message2.data[0] = static_cast<char>(mpptsOn);
+   message3.data[0] = static_cast<char>(mpptsOn);
    mpptCan_.write(message1);
    mpptCan_.write(message2);
    mpptCan_.write(message3);

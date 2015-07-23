@@ -26,6 +26,7 @@ private:
    void readCan();
 
    void queryForDilithiumData();
+   void setDilithiumState(bool mpptsOn);
    void sendMpptMode();
    void tryAndDecodeHelianthus(const CANMessage& receivedMessage);
 
