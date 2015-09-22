@@ -19,7 +19,7 @@ union FloatDataUnion
 
 namespace
 {
-   unsigned int BAUD_RATE = 115200;
+   unsigned int BAUD_RATE = 9600;
    unsigned int NUMBER_OF_BITS = 8;
    unsigned int STOP_BIT = 1;
    SerialBase::Parity PARITY = SerialBase::None;

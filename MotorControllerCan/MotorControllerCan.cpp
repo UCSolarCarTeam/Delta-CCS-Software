@@ -537,9 +537,9 @@ void MotorControllerCan::populateTritiumDataFormatter(const unsigned char* input
 
 void MotorControllerCan::checkIfOvercurrent()
 {
-   if (fabs(vehicleData_.batteryCurrent) > CcsDefines::MAX_BATTERY_CURRENT)
+   if ((vehicleData_.batteryCurrent < CcsDefines::MAX_BATTERY_CURRENT_DRAIN) ||
+      (vehicleData_.batteryCurrent > CcsDefines::MAX_BATTERY_CURRENT_CHARGE))
    {
       vehicleData_.overcurrentProtectionTripped = true;
    }
 }
-
