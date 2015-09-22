@@ -12,7 +12,8 @@
 class DriverControl
 {
 public:
-   DriverControl(const PinName& hazardsInput,
+   DriverControl(const PinName& deadmanInput,
+                 const PinName& hazardsInput,
                  const PinName& rightBlinkerInput,
                  const PinName& leftBlinkerInput,
                  const PinName& brakeInput,
@@ -44,6 +45,7 @@ private:
    bool isRegenBraking();
 
 private:
+   DigitalIn deadmanInput_;
    DigitalIn hazardsInput_;
    DigitalIn rightBlinkerInput_;
    DigitalIn leftBlinkerInput_;

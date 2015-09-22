@@ -15,7 +15,8 @@ namespace
    const float MAX_SPEED_TO_CHANGE_DIRECTIONS = 1.0f; // 1 m/s or 3.6 km/h
 }
 
-DriverControl::DriverControl(const PinName& hazardsInput,
+DriverControl::DriverControl(const PinName& deadmanInput,
+                             const PinName& hazardsInput,
                              const PinName& rightBlinkerInput,
                              const PinName& leftBlinkerInput,
                              const PinName& brakeInput,
@@ -26,7 +27,8 @@ DriverControl::DriverControl(const PinName& hazardsInput,
                              const PinName& arrayOnInput,
                              const PinName& highVoltageInput,
                              VehicleData& vehicleData)
-: hazardsInput_(hazardsInput)
+: deadmanInput_(deadmanInput)
+, hazardsInput_(hazardsInput)
 , rightBlinkerInput_(rightBlinkerInput)
 , leftBlinkerInput_(leftBlinkerInput)
 , brakeInput_(brakeInput)
@@ -65,7 +67,8 @@ void DriverControl::setSpeedAndCurrent()
    const VehicleData::CarDirection directionInput =
       static_cast<VehicleData::CarDirection>(directionInput_.read());
 
-   if (isNewVehicleDirectionInputSafe(directionInput))
+   if (vehicleData_.deadmanPressed &&
+      isNewVehicleDirectionInputSafe(directionInput))
    {
       if (isRegenBraking())
       {
@@ -149,6 +152,7 @@ void DriverControl::zeroDriverInputs()
 
 void DriverControl::readInputs()
 {
+   vehicleData_.deadmanPressed = deadmanInput_;
    vehicleData_.hazardsActivated = hazardsInput_;
    vehicleData_.rightBlinkerActivated = rightBlinkerInput_;
    vehicleData_.leftBlinkerActivated = leftBlinkerInput_;

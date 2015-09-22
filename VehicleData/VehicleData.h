@@ -36,6 +36,7 @@ struct VehicleData
    float driverSetCurrent;
    float driverSetCurrentPercentage;
    float driverSetSpeedRpm;
+   bool deadmanPressed;
    VehicleData::CarDirection carDirection;
 
    //Motor Controller
