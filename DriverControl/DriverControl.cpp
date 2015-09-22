@@ -67,8 +67,7 @@ void DriverControl::setSpeedAndCurrent()
    const VehicleData::CarDirection directionInput =
       static_cast<VehicleData::CarDirection>(directionInput_.read());
 
-   if (vehicleData_.deadmanPressed &&
-      isNewVehicleDirectionInputSafe(directionInput))
+   if (isNewVehicleDirectionInputSafe(directionInput))
    {
       if (isRegenBraking())
       {
