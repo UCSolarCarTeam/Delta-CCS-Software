@@ -22,7 +22,7 @@ namespace
    const PinName& PIN_DISPLAY_CHAR_2_CS = p12;
 
    const PinName& MPPT_MODE_SWITCH = p13;
-   const PinName& PIN_DEADMAN_INPUT = p14;
+   // const PinName& PIN_DEADMAN_INPUT = p14;
    const PinName& PIN_REGEN_INPUT = p15;
    const PinName& PIN_CURRENT_INPUT = p16;
 
@@ -66,7 +66,6 @@ Ccs::Ccs()
    CAN_MPPT_RD,
    vehicleData_)
 , driverControl_(
-   PIN_DEADMAN_INPUT,
    PIN_LIGHTS_HAZARDS_INPUT,
    PIN_LIGHTS_RIGHT_BLINKER_INPUT,
    PIN_LIGHTS_LEFT_BLINKER_INPUT,
