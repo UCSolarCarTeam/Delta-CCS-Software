@@ -16,3 +16,5 @@ CmuData::CmuData()
       cellVoltage[i] = i + 48;
    }
 }
+
+./configure -v -opengl es2 -device linux-rasp-pi-g''+ -device-option CROSS_COMPILE=/usr/bin/ -opensource -confirm-license -optimized-qmake -reduce-exports -release -qt-pcre -make libs -prefix /usr/local/qt5 &> output
