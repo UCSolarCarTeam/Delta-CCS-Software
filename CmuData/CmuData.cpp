@@ -8,4 +8,11 @@
 
 CmuData::CmuData()
 {
+   pcbTemperature = 46;
+   cellTemperature = 47;
+
+   for(int i = 0; i < 8; i++)
+   {
+      cellVoltage[i] = i + 48;
+   }
 }

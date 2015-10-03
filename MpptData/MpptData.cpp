@@ -9,9 +9,9 @@
 MpptData::MpptData()
 : type(Helianthus)
 , mode(Static)
-, voltageIn(0.0f)
-, voltageOut(0.0f)
-, currentIn(0.0f)
-, currentOut(0.0f)
+, voltageIn(56.0f)
+, voltageOut(57.0f)
+, currentIn(58.0f)
+, currentOut(59.0f)
 {
 }

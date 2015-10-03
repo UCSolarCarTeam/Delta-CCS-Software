@@ -5,12 +5,12 @@
    Copyright (c) 2014 by University of Calgary Solar Car Team
 -------------------------------------------------------*/
 
-#include <Dashboard.h>
-#include <DriverControl.h>
-#include <LedBmuErrorOutputService.h>
-#include <Lights.h>
-#include <MotorControllerCan.h>
-#include <MpptCan.h>
+// #include <Dashboard.h>
+// #include <DriverControl.h>
+// #include <LedBmuErrorOutputService.h>
+// #include <Lights.h>
+// #include <MotorControllerCan.h>
+// #include <MpptCan.h>
 #include <TelemetryReporting.h>
 #include <VehicleData.h>
 
@@ -24,14 +24,14 @@ public:
 
 private:
    VehicleData vehicleData_;
-   Lights lights_;
-   MotorControllerCan motorControllerCan_;
-   MpptCan mpptCan_;
-   DriverControl driverControl_;
-   Dashboard dashboard_;
+   // Lights lights_;
+   // MotorControllerCan motorControllerCan_;
+   // MpptCan mpptCan_;
+   // DriverControl driverControl_;
+   // Dashboard dashboard_;
    TelemetryReporting telemetryReporting_;
-   LedBmuErrorOutputService ledBmuErrorOutputService_;
+   // LedBmuErrorOutputService ledBmuErrorOutputService_;
 
    int telemetryTimer_;
-   int displayTimer_;
+   // int displayTimer_;
 };
