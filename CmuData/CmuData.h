@@ -11,4 +11,6 @@ struct CmuData
    float pcbTemperature;
    float cellTemperature;
    float cellVoltage[8];
+
+   static int cmuCount;
 };

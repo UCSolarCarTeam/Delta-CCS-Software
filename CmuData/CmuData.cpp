@@ -6,13 +6,17 @@
 
 #include <CmuData.h>
 
+int CmuData::cmuCount = 0;
+
 CmuData::CmuData()
 {
-   pcbTemperature = 46;
-   cellTemperature = 47;
+   pcbTemperature = 46 + (CmuData::cmuCount * 10);
+   cellTemperature = 47 + (CmuData::cmuCount * 10);
 
    for(int i = 0; i < 8; i++)
    {
-      cellVoltage[i] = i + 48;
+      cellVoltage[i] = i + 48 + (CmuData::cmuCount * 10);
    }
+
+   CmuData::cmuCount++;
 }

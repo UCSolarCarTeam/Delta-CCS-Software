@@ -32,4 +32,6 @@ struct MpptData
    float voltageOut;
    float currentIn;
    float currentOut;
+
+   static int mpptCount;
 };

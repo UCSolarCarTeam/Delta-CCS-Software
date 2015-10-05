@@ -6,12 +6,15 @@
 
 #include <MpptData.h>
 
+int MpptData::mpptCount = 0;
+
 MpptData::MpptData()
 : type(Helianthus)
 , mode(Static)
-, voltageIn(56.0f)
-, voltageOut(57.0f)
-, currentIn(58.0f)
-, currentOut(59.0f)
+, voltageIn(126.0f + MpptData::mpptCount * 4)
+, voltageOut(127.0f + MpptData::mpptCount * 4)
+, currentIn(128.0f + MpptData::mpptCount * 4)
+, currentOut(129.0f + MpptData::mpptCount * 4)
 {
+	MpptData::mpptCount++;
 }
