@@ -1,4 +1,6 @@
+sudo: required
+
 script:
-	- make
+    - make
 
 language: cpp
