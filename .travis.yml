@@ -1,5 +1,11 @@
 sudo: required
-
+before_install:
+    - git clone https://github.com/adamgreen/gcc4mbed.git
+    - cd gcc4mbed
+    - ./linux_install
+    - ./BuildShell
+    - make
+    -cd ..
 script:
     - make
 
