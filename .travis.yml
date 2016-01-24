@@ -1,6 +1,7 @@
 sudo: required
 before_install:
     - cd gcc4mbed
+    - ls
     - ./linux_install
     - ./BuildShell
     - make
