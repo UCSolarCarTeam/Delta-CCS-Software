@@ -1,6 +1,6 @@
 sudo: required
 before_install:
-    - cd adamgreen-gcc4mbed-399692d
+    - cd gcc4mbed
     - ./linux_install
     - ./BuildShell
     - make
