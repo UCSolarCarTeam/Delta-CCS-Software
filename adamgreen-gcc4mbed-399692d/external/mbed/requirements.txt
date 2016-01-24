@@ -1,5 +1,0 @@
-colorama
-pyserial
-prettytable
-Jinja2
-IntelHex
