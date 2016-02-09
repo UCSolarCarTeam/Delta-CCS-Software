@@ -1,4 +1,4 @@
-# README #
+# Schulich Delta CCS
 
 CCS v2 for the ARM mbed
 
